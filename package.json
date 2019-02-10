@@ -1,0 +1,25 @@
+{
+  "name": "nbabot",
+  "version": "1.0.0",
+  "description": "A Discord.js bot which keeps you up with the latest scores.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EliotChignell/NBABot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EliotChignell/NBABot/issues"
+  },
+  "homepage": "https://github.com/EliotChignell/NBABot#readme",
+  "dependencies": {
+    "better-sqlite-pool": "github:eslachance/better-sqlite-pool",
+    "discord.js": "^11.4.2",
+    "enmap": "^4.7.1",
+    "request": "^2.88.0"
+  }
+}
