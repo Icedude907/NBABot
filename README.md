@@ -1,4 +1,4 @@
-# NBABot
+# NBABot [GitHub](https://github.com/EliotChignell/NBABot) [Invite](https://discordapp.com/api/oauth2/authorize?client_id=544017840760422417&permissions=0&scope=bot)
 ### A Discord.js bot which keeps you up with the latest scores.
 
 ## Commands
