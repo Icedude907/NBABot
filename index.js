@@ -115,8 +115,19 @@ client.on('message', async message => {
                 message.channel.send(embed);
             });
             
-            
             break;
+
+        case 'player-info':
+            if (!args[0] || !args[1]) return message.channel.send("Please specifiy a player, e.g. `nba player-info lebron james`");
+            request('http://data.nba.net/10s/prod/v1/2018/players.json', (e,r,body) => {
+            	let b = JSON.parse(body);
+            	for (var i=0;i<b.league.standard.length;i++) {
+            		if (b.league.standard[i].firstName.toLowerCase() == args[0].toLowerCase() && b.league.standard[i].lastName.toLowerCase() == args[1].toLowerCase()) {
+            			message.channel.send("Found the player, height is "+b.league.standard[i].heightFeet+" "+b.league.standard.collegeName);
+            		}
+           		}
+            });
+        	break;
 
         case 'favourite':
             if (!args[0]) {
@@ -138,11 +149,6 @@ client.on('message', async message => {
             }
             break;
 
-        default:
-            sendEmbed = true;
-            eTitle = "Invalid Command";
-            eDescription = "Type `nba help` to find out the available commands.";
-            break;
     }
 
     if (sendEmbed) {
