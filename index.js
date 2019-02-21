@@ -66,12 +66,18 @@ client.on('message', async message => {
         case 'help':
             sendEmbed = true;
             eTitle = "Help";
-            eDescription = "These are the command that you can use:\n```help ping scores```";
+            eDescription = "These are the command that you can use:\n```help ping uptime scores```";
             break;
         
         case 'ping':
             const m = await message.channel.send("Ping?");
             m.edit(`Pong! Latency is ${m.createdTimestamp - message.createdTimestamp}ms. API Latency is ${Math.round(client.ping)}ms`);  
+            break;
+
+        case "uptime":
+            sendEmbed = true;
+            eTitle = "Uptime";
+            eDescription = "This session of NBABot has been online for\n```"+msToTime(client.uptime)+"```";
             break;
 
         case 'scores':
