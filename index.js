@@ -59,7 +59,8 @@ client.on('message', async message => {
       eDescription = "",
       eThumbnail = "",
       eImage = "",
-      user;
+      user,
+      me;
 
     switch(command) {
         
@@ -84,7 +85,7 @@ client.on('message', async message => {
 
             sendEmbed = false;
 
-            const me = await message.channel.send('Loading information...');
+            me = await message.channel.send('Loading information...');
 
             embed = new Discord.RichEmbed()
                         .setTitle("Scores for today:")
@@ -153,13 +154,13 @@ client.on('message', async message => {
         		for (var i=0;i<b.league.standard.length;i++) {
         			if (b.league.standard[i].firstName.toLowerCase() == args[0].toLowerCase() && b.league.standard[i].lastName.toLowerCase() == args[1].toLowerCase()) {
         				let playerName = b.league.standard[i].firstName+" "+b.league.standard[i].lastName;
-        				console.log(playerName);
+        				
         				request({
         					uri: 'http://data.nba.net/10s/prod/v1/2018/players/'+b.league.standard[i].personId+'_profile.json',
         					json: true
         				}, (e,r,b) => {
         					let player = b.league.standard.stats.latest;
-        					console.log(player);
+        					
         					let embed = new Discord.RichEmbed()
 	    			            .setTitle("Stats on the player `"+playerName+"`:")
 	    			            .setAuthor("NBABot",client.user.displayAvatarURL)
@@ -167,7 +168,7 @@ client.on('message', async message => {
 	    			            .setDescription("PPG: `"+player.ppg+"`\nAPG: `"+player.apg+"`\nRPG: `"+player.rpg+"`\nMPG: `"+player.mpg+"`\nTOPG: `"+player.topg+"`\nSPG: `"+player.spg+"`")
 	    			            .setFooter("nba [command]")
 	    			            .setTimestamp();
-	    			            return message.channel.send(embed);
+	    			            message.channel.send(embed);
 	           	
         				});
         			}
