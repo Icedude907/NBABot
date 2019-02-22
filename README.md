@@ -3,16 +3,16 @@
 
 ## Commands
 ### Basic Commands
-### `nba help`
+#### `nba help`
 This command shows you the commands which are available;
-### `nba ping`
+#### `nba ping`
 This command simply shows you the ping (how long it takes for the bot to recieve your request).
-### `nba uptime`
+#### `nba uptime`
 This command shows you how long the current session of NBABot has been online for. If it's a short time then I would've been working on it.
 ### NBA Commands
-### `nba scores`
+#### `nba scores`
 This command tells you the live scores for the day with an overview or important part of the game. 
-### `nba player-info [player]`
+#### `nba player-info [player]`
 This command gives you some basic information on the player. E.g. `nba player-info devin booker`.
-### `nba player-stats [player]`
+#### `nba player-stats [player]`
 This command gives you some basic stats on the player. E.g. `nba player-stats devin booker`.
