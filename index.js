@@ -66,7 +66,7 @@ client.on('message', async message => {
         case 'help':
             sendEmbed = true;
             eTitle = "Help";
-            eDescription = "These are the command that you can use:\n```help ping uptime scores```";
+            eDescription = "These are the command that you can use:\n```help ping uptime scores player-info player-stats```\nTo view detailed usage, visit [eliotchignell.github.io/NBABot](https://eliotchignell.github.io/NBABot)";
             break;
         
         case 'ping':
@@ -83,6 +83,8 @@ client.on('message', async message => {
         case 'scores':
 
             sendEmbed = false;
+
+            const me = await message.channel.send('Loading information...');
 
             embed = new Discord.RichEmbed()
                         .setTitle("Scores for today:")
@@ -103,7 +105,7 @@ client.on('message', async message => {
                     if (b.games[i].statusNum == 1) {
                         str2 += "Starts in "+msToTime(new Date(b.games[i].startTimeUTC).getTime()-new Date().getTime());
                     } else if (b.games[i].statusNum == 2) {
-                        str += ", Q"+b.games[i].period.current+" "+resp.games[i].clock;
+                        str += " | Q"+b.games[i].period.current+" "+b.games[i].clock;
                     } else {
                         str += ", FINAL";
                     }
@@ -112,21 +114,65 @@ client.on('message', async message => {
                     embed.addField(str, str2);
                     
                 }
-                message.channel.send(embed);
+                me.edit(embed);
             });
             
             break;
 
         case 'player-info':
             if (!args[0] || !args[1]) return message.channel.send("Please specifiy a player, e.g. `nba player-info lebron james`");
-            request('http://data.nba.net/10s/prod/v1/2018/players.json', (e,r,body) => {
-            	let b = JSON.parse(body);
+            request({
+            	uri:'http://data.nba.net/10s/prod/v1/2018/players.json',
+            	json: true
+            }, (e,r,b) => {
             	for (var i=0;i<b.league.standard.length;i++) {
             		if (b.league.standard[i].firstName.toLowerCase() == args[0].toLowerCase() && b.league.standard[i].lastName.toLowerCase() == args[1].toLowerCase()) {
-            			message.channel.send("Found the player, height is "+b.league.standard[i].heightFeet+" "+b.league.standard.collegeName);
+            			console.log("Player found.");
+            			let embed = new Discord.RichEmbed()
+     			            .setTitle("Basic Information on the player `"+b.league.standard[i].firstName+" "+b.league.standard[i].lastName+"`:")
+     			            .setAuthor("NBABot",client.user.displayAvatarURL)
+     			            .setColor(0xff4242)
+     			            .setDescription("Jersey Number: `"+b.league.standard[i].jersey+"`\nPosition: `"+b.league.standard[i].pos+"`\nHeight: `"+b.league.standard[i].heightFeet+"'"+b.league.standard[i].heightInches+'" ('+b.league.standard[i].heightMeters+"m)`\nWeight: `"+b.league.standard[i].weightKilograms+"kg`")
+     			            .setFooter("nba [command]")
+     			            .setTimestamp();
+     			            return message.channel.send(embed);
+            			
+            			break;
             		}
            		}
             });
+        	break;
+
+        case 'player-stats':
+        	if (!args[0] || !args[1]) return message.channel.send("Please specifiy a player, e.g. `nba player-stats lebron james`");
+        	request({
+        		uri:'http://data.nba.net/10s/prod/v1/2018/players.json',
+        		json: true
+        	}, (e,r,b) => {
+        		
+        		for (var i=0;i<b.league.standard.length;i++) {
+        			if (b.league.standard[i].firstName.toLowerCase() == args[0].toLowerCase() && b.league.standard[i].lastName.toLowerCase() == args[1].toLowerCase()) {
+        				let playerName = b.league.standard[i].firstName+" "+b.league.standard[i].lastName;
+        				console.log(playerName);
+        				request({
+        					uri: 'http://data.nba.net/10s/prod/v1/2018/players/'+b.league.standard[i].personId+'_profile.json',
+        					json: true
+        				}, (e,r,b) => {
+        					let player = b.league.standard.stats.latest;
+        					console.log(player);
+        					let embed = new Discord.RichEmbed()
+	    			            .setTitle("Stats on the player `"+playerName+"`:")
+	    			            .setAuthor("NBABot",client.user.displayAvatarURL)
+	    			            .setColor(0xff4242)
+	    			            .setDescription("PPG: `"+player.ppg+"`\nAPG: `"+player.apg+"`\nRPG: `"+player.rpg+"`\nMPG: `"+player.mpg+"`\nTOPG: `"+player.topg+"`\nSPG: `"+player.spg+"`")
+	    			            .setFooter("nba [command]")
+	    			            .setTimestamp();
+	    			            return message.channel.send(embed);
+	           	
+        				});
+        			}
+        		}
+        	})
         	break;
 
         case 'favourite':

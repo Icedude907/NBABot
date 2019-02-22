@@ -12,3 +12,7 @@ This command shows you how long the current session of NBABot has been online fo
 ### NBA Commands
 #### `nba scores`
 This command tells you the live scores for the day with an overview or important part of the game. 
+#### `nba player-info [player]`
+This command gives you some basic information on the player. E.g. `nba player-info devin booker`.
+#### `nba player-stats [player]`
+This command gives you some basic stats on the player. E.g. `nba player-stats devin booker`.
