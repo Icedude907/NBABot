@@ -12,12 +12,11 @@ const client = new Discord.Client();
 // Prefix
 const prefix = "nba ";
 
-let currentScoreboard;
+let clientReady = false;
 
-// Favourites enmap
-let favourites = new Enmap({name:'favourites'});
+let currentScoreboard;
  
-// Getting team triCodes
+/* Getting team triCodes
 let triCodes = [];
 request({
     uri:'http://data.nba.net/10s/prod/v2/2018/teams.json',
@@ -27,9 +26,9 @@ request({
     for (var i=0;i<teams.length;i++) {
         triCodes.push(teams[i].tricode);
     }
-});
+}); */
 
-// Getting team nicknames
+/* Getting team nicknames
 let nicknames = [];
 request({
     uri:'http://data.nba.net/10s/prod/v2/2018/teams.json',
@@ -39,17 +38,21 @@ request({
     for (var i=0;i<teams.length;i++) {
         triCodes.push(teams[i].nickname);
     }
-});
+}); */
 
 function msToTime(e){parseInt(e%1e3/100);var n=parseInt(e/1e3%60),r=parseInt(e/6e4%60),s=parseInt(e/36e5%24),t=parseInt(e/864e5%7);return(t=t<10?"0"+t:t)+"d:"+(s=s<10?"0"+s:s)+"h:"+(r=r<10?"0"+r:r)+"m:"+(n=n<10?"0"+n:n)+"s."}
 
 client.once('ready', () => {
     console.log(client.user.tag+" is ready!");
-    client.user.setActivity('nba help', {type: 'LISTENING'});
+    clientReady = true;
+    client.user.setActivity('nba help | Serving '+client.users.size+' users among '+client.guilds.size+' servers.', {type: 'LISTENING'});
 });
 
 client.on('message', async message => {
     if (!message.content.startsWith(prefix) || message.author.bot) return;
+
+	// Logging
+    console.log('('+message.author.tag+') '+message.content);
 
     const args = message.content.slice(prefix.length).split(' ');
     const command = args.shift().toLowerCase();
@@ -81,11 +84,26 @@ client.on('message', async message => {
             eDescription = "This session of NBABot has been online for\n```"+msToTime(client.uptime)+"```";
             break;
 
+        case 'eval':
+        	if (message.author.id == 401649168948396032) message.channel.send("```"+eval(args.join(' '))+"```");
+        	break;
+
+        case 'servers':
+        	if (message.author.id == 401649168948396032) {
+        		let strServers = '```';
+        		client.guilds.forEach(g => {
+        			strServers += g.name+", "+g.members.size+"\n";
+        		});
+        		strServers += "```";
+        		message.author.send(strServers);
+        	}
+        	break;
+
         case 'scores':
 
             sendEmbed = false;
 
-            me = await message.channel.send('Loading information...');
+            me = await message.channel.send('Loading scores...');
 
             embed = new Discord.RichEmbed()
                         .setTitle("Scores for today:")
@@ -102,9 +120,14 @@ client.on('message', async message => {
                     
                     let str = "";
                     let str2 = "";
+                    if (b.games[i].statusNum == 2) str += ":red_circle: ";
                     str += b.games[i].vTeam.triCode+" "+b.games[i].vTeam.score+" - "+b.games[i].hTeam.score+" "+b.games[i].hTeam.triCode;
                     if (b.games[i].statusNum == 1) {
-                        str2 += "Starts in "+msToTime(new Date(b.games[i].startTimeUTC).getTime()-new Date().getTime());
+                    	if (new Date(b.games[i].startTimeUTC).getTime()-new Date().getTime() < 0) {
+                    		str2 += "Starting soon"
+                    	} else {
+                    		str2 += "Starts in "+msToTime(new Date(b.games[i].startTimeUTC).getTime()-new Date().getTime());
+                    	}
                     } else if (b.games[i].statusNum == 2) {
                         str += " | Q"+b.games[i].period.current+" "+b.games[i].clock;
                     } else {
@@ -175,26 +198,6 @@ client.on('message', async message => {
         		}
         	})
         	break;
-
-        case 'favourite':
-            if (!args[0]) {
-                sendEmbed = true;
-                eTitle = "Favourite Team";
-                eDescription = "Please specifiy a team, e.g. `nba favourite suns`\nOnce you favourite a team, you will recieve DMs with the results of your favourite team's latest game.\nType `nba favourite cancel` to cancel.\nAvailable teams: ```"+triCodes.join(' ')+"```";
-                if (favourites.get(message.author.id)) eDescription += "Your current favourite team: `"+favourites.get(message.author.id)+"`";
-            } else if (args[0] && args[0].toLowerCase() != "cancel") {
-                if (!triCodes.includes(args[0].toUpperCase())) return message.channel.send("Please specify a valid team!");
-                favourites.set(message.author.id, args[0].toUpperCase());
-                sendEmbed = true;
-                eTitle = "Favourite Team";
-                eDescription = "Well Done!\nYou favourited the team `"+args[0].toUpperCase()+"`\nOnce you favourite a team, you will recieve DMs with the results of your favourite team's latest game.\nType `nba favourite cancel` to cancel.";
-            } else if (args[0].toLowerCase() == "cancel") {
-                favourites.delete(message.author.id);
-                sendEmbed = true;
-                eTitle = "Favourite Team";
-                eDescription = "You cancelled your favourite team.";
-            }
-            break;
 
     }
 
