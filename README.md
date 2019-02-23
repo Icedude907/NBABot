@@ -4,7 +4,7 @@
 ## Commands
 ### Basic Commands
 #### `nba help`
-This command shows you the commands which are available;
+This command shows you the commands which are available.
 #### `nba ping`
 This command simply shows you the ping (how long it takes for the bot to recieve your request).
 #### `nba uptime`
