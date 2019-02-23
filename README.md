@@ -11,8 +11,11 @@ This command simply shows you the ping (how long it takes for the bot to recieve
 This command shows you how long the current session of NBABot has been online for. If it's a short time then I would've been working on it.
 ### NBA Commands
 #### `nba scores`
-This command tells you the live scores for the day with an overview or important part of the game. 
+This command tells you the live scores for the day with an overview or important part of the game.
+![nba scores preview](https://github.com/EliotChignell/NBABot/raw/master/assets/scores.png)
 #### `nba player-info [player]`
 This command gives you some basic information on the player. E.g. `nba player-info devin booker`.
+![nba player-info](https://github.com/EliotChignell/NBABot/raw/master/assets/player-stats.png)
 #### `nba player-stats [player]`
 This command gives you some basic stats on the player. E.g. `nba player-stats devin booker`.
+![nba player-stats](https://github.com/EliotChignell/NBABot/raw/master/assets/player-info.png)
