@@ -1,6 +1,6 @@
 // Libraries
 const Discord = require('discord.js');
-const request = require('request');
+const request = require('request-promise');
 const Enmap = require('enmap');
 
 // JSON Files
@@ -12,33 +12,12 @@ const client = new Discord.Client();
 // Prefix
 const prefix = "nba ";
 
+// Enmaps
+const botStats = new Enmap({name: "botStats"});
+
 let clientReady = false;
 
 let currentScoreboard;
- 
-/* Getting team triCodes
-let triCodes = [];
-request({
-    uri:'http://data.nba.net/10s/prod/v2/2018/teams.json',
-    json: true
-}, (e,r,b) => {
-    let teams = b.league.vegas;
-    for (var i=0;i<teams.length;i++) {
-        triCodes.push(teams[i].tricode);
-    }
-}); */
-
-/* Getting team nicknames
-let nicknames = [];
-request({
-    uri:'http://data.nba.net/10s/prod/v2/2018/teams.json',
-    json: true
-}, (e,r,b) => {
-    let teams = b.league.vegas;
-    for (var i=0;i<teams.length;i++) {
-        triCodes.push(teams[i].nickname);
-    }
-}); */
 
 function msToTime(e){parseInt(e%1e3/100);var n=parseInt(e/1e3%60),r=parseInt(e/6e4%60),s=parseInt(e/36e5%24),t=parseInt(e/864e5%7);return(t=t<10?"0"+t:t)+"d:"+(s=s<10?"0"+s:s)+"h:"+(r=r<10?"0"+r:r)+"m:"+(n=n<10?"0"+n:n)+"s."}
 
@@ -68,6 +47,7 @@ client.on('message', async message => {
     switch(command) {
         
         case 'help':
+        case 'commands':
             sendEmbed = true;
             eTitle = "Help";
             eDescription = "These are the command that you can use:\n```help ping uptime scores player-info player-stats```\nTo view detailed usage, visit [eliotchignell.github.io/NBABot](https://eliotchignell.github.io/NBABot)";
@@ -131,7 +111,7 @@ client.on('message', async message => {
                     } else if (b.games[i].statusNum == 2) {
                         str += " | Q"+b.games[i].period.current+" "+b.games[i].clock;
                     } else {
-                        str += ", FINAL";
+                        str += " | FINAL";
                     }
                     if (!b.games[i].nugget.text && str2 == "") str2 = "...";
                     if (b.games[i].nugget.text) str2 = b.games[i].nugget.text;
@@ -169,6 +149,7 @@ client.on('message', async message => {
 
         case 'player-stats':
         	if (!args[0] || !args[1]) return message.channel.send("Please specifiy a player, e.g. `nba player-stats lebron james`");
+        	me = await message.channel.send("Loading...")
         	request({
         		uri:'http://data.nba.net/10s/prod/v1/2018/players.json',
         		json: true
@@ -188,15 +169,20 @@ client.on('message', async message => {
 	    			            .setTitle("Stats on the player `"+playerName+"`:")
 	    			            .setAuthor("NBABot",client.user.displayAvatarURL)
 	    			            .setColor(0xff4242)
-	    			            .setDescription("PPG: `"+player.ppg+"`\nAPG: `"+player.apg+"`\nRPG: `"+player.rpg+"`\nMPG: `"+player.mpg+"`\nTOPG: `"+player.topg+"`\nSPG: `"+player.spg+"`")
+	    			            .setDescription("PPG: `"+player.ppg+"`\nAPG: `"+player.apg+"`\nRPG: `"+player.rpg+"`\nMPG: `"+player.mpg+"`\nTOPG: `"+player.topg+"`\nSPG: `"+player.spg+"`\nFT%: `"+player.ftp+"%`\nFG%: `"+player.fgp+"%`\n+/-: `"+player.plusMinus+"`")
 	    			            .setFooter("nba [command]")
 	    			            .setTimestamp();
-	    			            message.channel.send(embed);
+                                me.edit(embed);
+                                
+                            return;
 	           	
         				});
         			}
-        		}
-        	})
+                }
+            }).then(() => {
+                me.edit("Player not found.");
+            });
+            
         	break;
 
     }
