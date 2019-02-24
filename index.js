@@ -135,12 +135,14 @@ client.on('message', async message => {
             }, (e,r,b) => {
             	for (var i=0;i<b.league.standard.length;i++) {
             		if (b.league.standard[i].firstName.toLowerCase() == args[0].toLowerCase() && b.league.standard[i].lastName.toLowerCase() == args[1].toLowerCase()) {
-            			playerFound = true;
+                        playerFound = true;
+                        let draftStr = "`#"+b.league.standard[i].draft.pickNum+" ("+b.league.standard[i].draft.seasonYear+")`";
+                        if (draftStr == "`# ()`") draftStr = "`Undrafted`";
             			let embed = new Discord.RichEmbed()
      			            .setTitle("Basic Information on the player `"+b.league.standard[i].firstName+" "+b.league.standard[i].lastName+"`:")
      			            .setAuthor("NBABot",client.user.displayAvatarURL)
      			            .setColor(0xff4242)
-     			            .setDescription("Jersey Number: `"+b.league.standard[i].jersey+"`\nPosition: `"+b.league.standard[i].pos+"`\nHeight: `"+b.league.standard[i].heightFeet+"'"+b.league.standard[i].heightInches+'" ('+b.league.standard[i].heightMeters+"m)`\nWeight: `"+b.league.standard[i].weightKilograms+"kg`")
+     			            .setDescription("Jersey Number: `"+b.league.standard[i].jersey+"`\nPosition: `"+b.league.standard[i].pos+"`\nHeight: `"+b.league.standard[i].heightFeet+"'"+b.league.standard[i].heightInches+'" ('+b.league.standard[i].heightMeters+"m)`\nWeight: `"+b.league.standard[i].weightKilograms+"kg`\nDate of Birth: `"+b.league.standard[i].dateOfBirthUTC+"`\nDrafted: "+draftStr+"\n\n_Type `nba player-stats "+args[0]+" "+args[1]+"` to view stats on that player._")
      			            .setFooter("nba [command]")
      			            .setTimestamp();
      			            return me.edit(embed);
@@ -178,7 +180,7 @@ client.on('message', async message => {
 	    			            .setTitle("Stats on the player `"+playerName+"`:")
 	    			            .setAuthor("NBABot",client.user.displayAvatarURL)
 	    			            .setColor(0xff4242)
-	    			            .setDescription("PPG: `"+player.ppg+"`\nAPG: `"+player.apg+"`\nRPG: `"+player.rpg+"`\nMPG: `"+player.mpg+"`\nTOPG: `"+player.topg+"`\nSPG: `"+player.spg+"`\nFT%: `"+player.ftp+"%`\nFG%: `"+player.fgp+"%`\n+/-: `"+player.plusMinus+"`")
+	    			            .setDescription("PPG: `"+player.ppg+"`\nAPG: `"+player.apg+"`\nRPG: `"+player.rpg+"`\nMPG: `"+player.mpg+"`\nTOPG: `"+player.topg+"`\nSPG: `"+player.spg+"`\nFT%: `"+player.ftp+"%`\nFG%: `"+player.fgp+"%`\n+/-: `"+player.plusMinus+"`\n\n_Type `nba player-info "+args[0]+" "+args[1]+"` to view info on that player._")
 	    			            .setFooter("nba [command]")
 	    			            .setTimestamp();
                                 return me.edit(embed);
