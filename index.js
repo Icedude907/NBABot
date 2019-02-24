@@ -42,7 +42,8 @@ client.on('message', async message => {
       eThumbnail = "",
       eImage = "",
       user,
-      me;
+      me,
+      playerFound;
 
     switch(command) {
         
@@ -125,13 +126,16 @@ client.on('message', async message => {
 
         case 'player-info':
             if (!args[0] || !args[1]) return message.channel.send("Please specifiy a player, e.g. `nba player-info lebron james`");
+            playerFound = false;
+            me = await message.channel.send("Loading...");
+
             request({
             	uri:'http://data.nba.net/10s/prod/v1/2018/players.json',
             	json: true
             }, (e,r,b) => {
             	for (var i=0;i<b.league.standard.length;i++) {
             		if (b.league.standard[i].firstName.toLowerCase() == args[0].toLowerCase() && b.league.standard[i].lastName.toLowerCase() == args[1].toLowerCase()) {
-            			console.log("Player found.");
+            			playerFound = true;
             			let embed = new Discord.RichEmbed()
      			            .setTitle("Basic Information on the player `"+b.league.standard[i].firstName+" "+b.league.standard[i].lastName+"`:")
      			            .setAuthor("NBABot",client.user.displayAvatarURL)
@@ -139,17 +143,21 @@ client.on('message', async message => {
      			            .setDescription("Jersey Number: `"+b.league.standard[i].jersey+"`\nPosition: `"+b.league.standard[i].pos+"`\nHeight: `"+b.league.standard[i].heightFeet+"'"+b.league.standard[i].heightInches+'" ('+b.league.standard[i].heightMeters+"m)`\nWeight: `"+b.league.standard[i].weightKilograms+"kg`")
      			            .setFooter("nba [command]")
      			            .setTimestamp();
-     			            return message.channel.send(embed);
+     			            return me.edit(embed);
             			
             			break;
             		}
            		}
+            }).then(() => {
+                if (!playerFound) me.edit("Player not found.");
             });
+
         	break;
 
         case 'player-stats':
-        	if (!args[0] || !args[1]) return message.channel.send("Please specifiy a player, e.g. `nba player-stats lebron james`");
-        	me = await message.channel.send("Loading...")
+            if (!args[0] || !args[1]) return message.channel.send("Please specifiy a player, e.g. `nba player-stats lebron james`");
+            playerFound = false;
+        	me = await message.channel.send("Loading...");
         	request({
         		uri:'http://data.nba.net/10s/prod/v1/2018/players.json',
         		json: true
@@ -157,6 +165,7 @@ client.on('message', async message => {
         		
         		for (var i=0;i<b.league.standard.length;i++) {
         			if (b.league.standard[i].firstName.toLowerCase() == args[0].toLowerCase() && b.league.standard[i].lastName.toLowerCase() == args[1].toLowerCase()) {
+                        playerFound = true;
         				let playerName = b.league.standard[i].firstName+" "+b.league.standard[i].lastName;
         				
         				request({
@@ -172,15 +181,12 @@ client.on('message', async message => {
 	    			            .setDescription("PPG: `"+player.ppg+"`\nAPG: `"+player.apg+"`\nRPG: `"+player.rpg+"`\nMPG: `"+player.mpg+"`\nTOPG: `"+player.topg+"`\nSPG: `"+player.spg+"`\nFT%: `"+player.ftp+"%`\nFG%: `"+player.fgp+"%`\n+/-: `"+player.plusMinus+"`")
 	    			            .setFooter("nba [command]")
 	    			            .setTimestamp();
-                                me.edit(embed);
-                                
-                            return;
-	           	
+                                return me.edit(embed);
         				});
-        			}
+        			} 
                 }
             }).then(() => {
-                me.edit("Player not found.");
+                if (!playerFound) me.edit("Player not found.");
             });
             
         	break;
