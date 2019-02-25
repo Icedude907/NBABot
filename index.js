@@ -2,12 +2,15 @@
 const Discord = require('discord.js');
 const request = require('request-promise');
 const Enmap = require('enmap');
+const DiscordBotList = require('dblapi.js');
 
 // JSON Files
 const secrets = require('./secrets.json');
 
 // Client
 const client = new Discord.Client();
+
+const dbl = new DiscordBotList(secrets.dbl);
 
 // Prefix
 const prefix = "nba ";
@@ -49,9 +52,10 @@ client.on('message', async message => {
         
         case 'help':
         case 'commands':
+        	dbl.postStats(client.guilds.size);
             sendEmbed = true;
             eTitle = "Help";
-            eDescription = "These are the command that you can use:\n```help ping uptime scores player-info player-stats```\nTo view detailed usage, visit [eliotchignell.github.io/NBABot](https://eliotchignell.github.io/NBABot)";
+            eDescription = "These are the command that you can use:\n```help ping uptime scores player-info player-stats```\nTo view detailed usage, visit [chig.js.org/NBABot](https://chig.js.org/NBABot)\nFeel free to vote for this bot so other people hear about it [here](https://discordbots.org/bot/544017840760422417/vote).";
             break;
         
         case 'ping':
