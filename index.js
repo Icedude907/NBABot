@@ -52,7 +52,6 @@ client.on('message', async message => {
         
         case 'help':
         case 'commands':
-        	dbl.postStats(client.guilds.size);
             sendEmbed = true;
             eTitle = "Help";
             eDescription = "These are the command that you can use:\n```help ping uptime scores player-info player-stats```\nTo view detailed usage, visit [chig.js.org/NBABot](https://chig.js.org/NBABot)\nFeel free to vote for this bot so other people hear about it [here](https://discordbots.org/bot/544017840760422417/vote).";
@@ -195,7 +194,50 @@ client.on('message', async message => {
                 if (!playerFound) me.edit("Player not found.");
             });
             
-        	break;
+            break;
+        
+        /*
+        case 'predictions':
+
+            me = await message.channel.send("Loading games...");
+
+            embed = new Discord.RichEmbed()
+                        .setTitle("Available games to predict:")
+                        .setAuthor("NBABot",client.user.displayAvatarURL)
+                        .setColor(0xff4242)
+                        .setFooter("nba [command]")
+                        .setTimestamp();
+            
+            request({
+                uri: "https://api.myjson.com/bins/k7xwk",
+                json: true
+            }, (e,r,b) => {
+
+                let availableTeams = [];
+
+                for (var i=0;i<b.games.length;i++) {
+                    let game = b.games[i];
+
+                    if (game.statusNum == 1) {
+                        embed.addField(game.vTeam.triCode+" @ "+game.hTeam.triCode,"Game starts in "+msToTime(new Date(game.startTimeUTC).getTime() - new Date().getTime())+".");
+                        availableTeams.push(game.vTeam.triCode+"/"+game.hTeam.triCode);
+                    }
+
+                }
+
+                if (availableTeams.length == 0) return me.edit("There are no games left to predict today.");
+
+                embed.addField("Enter this to predict today's games:","nba predict "+availableTeams.join(' '));
+
+                me.edit(embed);
+            });
+            
+            break;
+
+        case 'predict':
+            break;
+        
+        */
 
     }
 
@@ -209,9 +251,15 @@ client.on('message', async message => {
             .setImage(eImage)
             .setThumbnail(eThumbnail)
             .setTimestamp();
-            message.channel.send(embed);
+        message.channel.send(embed);
     }
 });
 
 client.on('error', console.error);
+
+setInterval(() => {
+    if (clientReady) client.user.setActivity('nba help | Serving '+client.users.size+' users among '+client.guilds.size+' servers.', {type: 'LISTENING'});
+    dbl.postStats(client.guilds.size);
+}, 30000);
+
 client.login(secrets.token);
