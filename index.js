@@ -27,7 +27,7 @@ function msToTime(e){parseInt(e%1e3/100);var n=parseInt(e/1e3%60),r=parseInt(e/6
 client.once('ready', () => {
     console.log(client.user.tag+" is ready!");
     clientReady = true;
-    client.user.setActivity('nba help | Serving '+client.users.size+' users among '+client.guilds.size+' servers.', {type: 'LISTENING'});
+    client.user.setActivity('nba help | Serving '+client.users.size+' users among '+client.guilds.size+' servers. | chig.js.org/NBABot', {type: 'LISTENING'});
 });
 
 client.on('message', async message => {
@@ -258,7 +258,7 @@ client.on('message', async message => {
 client.on('error', console.error);
 
 setInterval(() => {
-    if (clientReady) client.user.setActivity('nba help | Serving '+client.users.size+' users among '+client.guilds.size+' servers.', {type: 'LISTENING'});
+    if (clientReady) client.user.setActivity('nba help | Serving '+client.users.size+' users among '+client.guilds.size+' servers. | chig.js.org/NBABot', {type: 'LISTENING'});
     dbl.postStats(client.guilds.size);
 }, 30000);
 
