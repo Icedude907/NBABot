@@ -196,7 +196,6 @@ client.on('message', async message => {
             
             break;
         
-        /*
         case 'predictions':
 
             me = await message.channel.send("Loading games...");
@@ -237,7 +236,7 @@ client.on('message', async message => {
         case 'predict':
             break;
         
-        */
+        
 
     }
 
