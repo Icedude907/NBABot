@@ -226,7 +226,7 @@ client.on('message', async message => {
 
                 if (availableTeams.length == 0) return me.edit("There are no games left to predict today.");
 
-                embed.addField("Enter this to predict today's games:","nba predict "+availableTeams.join(' '));
+                embed.addField("Enter this to predict today's games:","`nba predict "+availableTeams.join(' ')+"`");
 
                 me.edit(embed);
             });
