@@ -34,7 +34,7 @@ client.on('message', async message => {
     if (!message.content.startsWith(prefix) || message.author.bot) return;
 
 	// Logging
-    console.log('('+message.author.tag+') '+message.content);
+    console.log(message.guild.name+' ('+message.author.tag+') '+message.content);
 
     const args = message.content.slice(prefix.length).split(' ');
     const command = args.shift().toLowerCase();
