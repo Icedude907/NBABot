@@ -27,7 +27,7 @@ function msToTime(e){parseInt(e%1e3/100);var n=parseInt(e/1e3%60),r=parseInt(e/6
 client.once('ready', () => {
     console.log(client.user.tag+" is ready!");
     clientReady = true;
-    client.user.setActivity('nba help | Serving '+client.users.size+' users among '+client.guilds.size+' servers. | chig.js.org/NBABot', {type: 'LISTENING'});
+    client.user.setActivity('nba help | Serving '+client.users.size+' users among '+client.guilds.size+' servers. | nbabot.js.org', {type: 'LISTENING'});
 });
 
 client.on('message', async message => {
@@ -54,7 +54,7 @@ client.on('message', async message => {
         case 'commands':
             sendEmbed = true;
             eTitle = "Help";
-            eDescription = "These are the command that you can use:\n```help ping uptime scores player-info player-stats```\nTo view detailed usage, visit [chig.js.org/NBABot](https://chig.js.org/NBABot)\nFeel free to vote for this bot so other people hear about it [here](https://discordbots.org/bot/544017840760422417/vote).";
+            eDescription = "These are the command that you can use:\n```help ping uptime scores player-info player-stats```\nTo view detailed usage, visit [nbabot.js.org](https://nbabot.js.org)\nFeel free to vote for this bot so other people hear about it [here](https://discordbots.org/bot/544017840760422417/vote).";
             break;
         
         case 'ping':
@@ -67,6 +67,18 @@ client.on('message', async message => {
             eTitle = "Uptime";
             eDescription = "This session of NBABot has been online for\n```"+msToTime(client.uptime)+"```";
             break;
+
+        case 'invite':
+        	sendEmbed = true;
+        	eTitle = "Invite NBABot to your servers.";
+        	eDescription = "https://discordbots.org/bot/544017840760422417";
+        	break;
+
+		case 'vote':
+			sendEmbed = true;
+			eTitle = "Vote for NBABot";
+			eDescription = "NBABot is and will be completely free. To support this bot, add it to your discord servers and make sure to vote for my bot as much as possible so it gains popularity and more people discover this bot.\nhttps://discordbots.org/bot/544017840760422417/vote";
+			break;
 
         case 'eval':
         	if (message.author.id == 401649168948396032) message.channel.send("```"+eval(args.join(' '))+"```");
@@ -257,7 +269,7 @@ client.on('message', async message => {
 client.on('error', console.error);
 
 setInterval(() => {
-    if (clientReady) client.user.setActivity('nba help | Serving '+client.users.size+' users among '+client.guilds.size+' servers. | chig.js.org/NBABot', {type: 'LISTENING'});
+    if (clientReady) client.user.setActivity('nba help | Serving '+client.users.size+' users among '+client.guilds.size+' servers. | nbabot.js.org', {type: 'LISTENING'});
     dbl.postStats(client.guilds.size);
 }, 30000);
 
