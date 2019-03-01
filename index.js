@@ -54,7 +54,7 @@ client.on('message', async message => {
         case 'commands':
             sendEmbed = true;
             eTitle = "Help";
-            eDescription = "These are the command that you can use:\n```help ping uptime scores player-info player-stats```\nTo view detailed usage, visit [nbabot.js.org](https://nbabot.js.org)\nFeel free to vote for this bot so other people hear about it [here](https://discordbots.org/bot/544017840760422417/vote).";
+            eDescription = "These are the command that you can use:\n```prolog\nNormal Commands\nhelp ping uptime invite vote\nNBA Commands\nscores player-info player-stats```\nTo view detailed usage, visit [nbabot.js.org](https://nbabot.js.org)\nFeel free to vote for this bot so other people hear about it [here](https://discordbots.org/bot/544017840760422417/vote).";
             break;
         
         case 'ping':
