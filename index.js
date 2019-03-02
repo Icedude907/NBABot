@@ -141,7 +141,7 @@ client.on('message', async message => {
             break;
 
         case 'player-info':
-            if (!args[0] || !args[1]) return message.channel.send("Please specifiy a player, e.g. `nba player-info lebron james`");
+            if (!args[0] || !args[1] || args[0].split('').includes("[") || args[1].split('').includes("]")) return message.channel.send("Please specifiy a player, e.g. `nba player-info lebron james`");
             playerFound = false;
             me = await message.channel.send("Loading...");
 
@@ -173,7 +173,7 @@ client.on('message', async message => {
         	break;
 
         case 'player-stats':
-            if (!args[0] || !args[1]) return message.channel.send("Please specifiy a player, e.g. `nba player-stats lebron james`");
+            if (!args[0] || !args[1] || args[0].split('').includes("[") || args[1].split('').includes(']')) return message.channel.send("Please specifiy a player, e.g. `nba player-stats lebron james`");
             playerFound = false;
         	me = await message.channel.send("Loading...");
         	request({
@@ -208,7 +208,8 @@ client.on('message', async message => {
             });
             
             break;
-        
+
+        /*
         case 'predictions':
 
             me = await message.channel.send("Loading games...");
@@ -248,7 +249,7 @@ client.on('message', async message => {
 
         case 'predict':
             break;
-        
+        */
         
 
     }
