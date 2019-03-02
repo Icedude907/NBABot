@@ -27,7 +27,7 @@ function msToTime(e){parseInt(e%1e3/100);var n=parseInt(e/1e3%60),r=parseInt(e/6
 client.once('ready', () => {
     console.log(client.user.tag+" is ready!");
     clientReady = true;
-    client.user.setActivity('nba help | Serving '+client.users.size+' users among '+client.guilds.size+' servers. | nbabot.js.org', {type: 'LISTENING'});
+    client.user.setActivity('nba help | Serving '+client.users.size+' users among '+client.guilds.size+' servers. | nbabot.js.org | made by chig#4519', {type: 'LISTENING'});
 });
 
 client.on('message', async message => {
@@ -97,8 +97,6 @@ client.on('message', async message => {
 
         case 'scores':
 
-            sendEmbed = false;
-
             me = await message.channel.send('Loading scores...');
 
             embed = new Discord.RichEmbed()
@@ -129,8 +127,11 @@ client.on('message', async message => {
                     } else {
                         str += " | FINAL";
                     }
-                    if (!b.games[i].nugget.text && str2 == "") str2 = "...";
-                    if (b.games[i].nugget.text) str2 = b.games[i].nugget.text;
+                    if (!b.games[i].nugget.text && str2 == "") {
+                    	str2 = "...";
+                    } else if (b.games[i].nugget.text) {
+                    	str2 += "\n"+b.games[i].nugget.text;
+                    }
                     embed.addField(str, str2);
                     
                 }
@@ -269,7 +270,7 @@ client.on('message', async message => {
 client.on('error', console.error);
 
 setInterval(() => {
-    if (clientReady) client.user.setActivity('nba help | Serving '+client.users.size+' users among '+client.guilds.size+' servers. | nbabot.js.org', {type: 'LISTENING'});
+    if (clientReady) client.user.setActivity('nba help | Serving '+client.users.size+' users among '+client.guilds.size+' servers. | nbabot.js.org | made by chig#4519', {type: 'LISTENING'});
     dbl.postStats(client.guilds.size);
 }, 30000);
 
