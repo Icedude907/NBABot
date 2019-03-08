@@ -2,7 +2,7 @@
 const Discord = require('discord.js');
 const request = require('request-promise');
 const Enmap = require('enmap');
-const DiscordBotList = require('dblapi.js');
+// const DiscordBotList = require('dblapi.js');
 
 // JSON Files
 const secrets = require('./secrets.json');
@@ -10,7 +10,7 @@ const secrets = require('./secrets.json');
 // Client
 const client = new Discord.Client();
 
-const dbl = new DiscordBotList(secrets.dbl);
+// const dbl = new DiscordBotList(secrets.dbl);
 
 // Prefix
 const prefix = "nba ";
@@ -20,20 +20,47 @@ const botStats = new Enmap({name: "botStats"});
 
 let clientReady = false;
 
-let currentScoreboard;
+let currentScoreboard,
+    currentDate,
+    seasonScheduleYear,
+    players = {};
 
 function msToTime(e){parseInt(e%1e3/100);var n=parseInt(e/1e3%60),r=parseInt(e/6e4%60),s=parseInt(e/36e5%24),t=parseInt(e/864e5%7);return(t=t<10?"0"+t:t)+"d:"+(s=s<10?"0"+s:s)+"h:"+(r=r<10?"0"+r:r)+"m:"+(n=n<10?"0"+n:n)+"s."}
 
 client.once('ready', () => {
     console.log(client.user.tag+" is ready!");
     clientReady = true;
+
+    request({
+        uri: "http://data.nba.net/10s/prod/v1/today.json",
+        json: true
+    }, (e,r,b) => {
+        seasonScheduleYear = b.seasonScheduleYear;
+    });
+
+    request({
+        uri: "http://data.nba.net/10s/prod/v1/today.json",
+        json: true
+    }, (e,r,b) => {
+        currentDate = b.links.currentDate;
+    });
+
+    request({
+        uri: 'http://data.nba.net/10s/prod/v1/2018/players.json',
+        json: true
+    }, (e,r,b) => {
+        for (var i=0;i<b.league.standard.length;i++) {
+            players[b.league.standard[i].personId] = b.league.standard[i].firstName+" "+b.league.standard[i].lastName;
+        }
+    });
+
     client.user.setActivity('nba help | Serving '+client.users.size+' users among '+client.guilds.size+' servers. | nbabot.js.org | made by chig#4519', {type: 'LISTENING'});
 });
 
 client.on('message', async message => {
-    if (!message.content.startsWith(prefix) || message.author.bot) return;
+    if (message.content.split(' ')[0].toLowerCase() != "nba" || message.author.bot) return;
 
-	// Logging
+	// Logging user messages
     console.log(message.guild.name+' ('+message.author.tag+') '+message.content);
 
     const args = message.content.slice(prefix.length).split(' ');
@@ -107,7 +134,7 @@ client.on('message', async message => {
                         .setTimestamp();
 
             request({
-                uri: "https://api.myjson.com/bins/k7xwk",
+                uri: "http://data.nba.net/10s/prod/v1/"+currentDate+"/scoreboard.json",
                 json: true
             }, (e,r,b) => {
                 for (var i=0;i<b.games.length;i++) {
@@ -146,7 +173,7 @@ client.on('message', async message => {
             me = await message.channel.send("Loading...");
 
             request({
-            	uri:'http://data.nba.net/10s/prod/v1/2018/players.json',
+            	uri:'http://data.nba.net/10s/prod/v1/'+seasonScheduleYear+'/players.json',
             	json: true
             }, (e,r,b) => {
             	for (var i=0;i<b.league.standard.length;i++) {
@@ -177,7 +204,7 @@ client.on('message', async message => {
             playerFound = false;
         	me = await message.channel.send("Loading...");
         	request({
-        		uri:'http://data.nba.net/10s/prod/v1/2018/players.json',
+        		uri:'http://data.nba.net/10s/prod/v1/'+seasonScheduleYear+'/players.json',
         		json: true
         	}, (e,r,b) => {
         		
@@ -187,7 +214,7 @@ client.on('message', async message => {
         				let playerName = b.league.standard[i].firstName+" "+b.league.standard[i].lastName;
         				
         				request({
-        					uri: 'http://data.nba.net/10s/prod/v1/2018/players/'+b.league.standard[i].personId+'_profile.json',
+        					uri: 'http://data.nba.net/10s/prod/v1/'+seasonScheduleYear+'/players/'+b.league.standard[i].personId+'_profile.json',
         					json: true
         				}, (e,r,b) => {
         					let player = b.league.standard.stats.latest;
@@ -251,6 +278,81 @@ client.on('message', async message => {
             break;
         */
         
+        case 'boxscore':
+
+            me = await message.channel.send("Loading...");
+            
+            if (!args[0]) return me.edit("Please specify a team. E.g. `nba boxscore PHX`.");
+
+            request({
+                uri: "http://data.nba.net/10s/prod/v1/"+currentDate+"/scoreboard.json",
+                json: true
+            }, (e,r,b) => {
+                for (var i=0;i<b.games.length;i++) {
+                    let team, otherTeam, vTeam, hTeam, gameId;
+
+                    gameId = b.games[i].gameId;
+
+                    if (args[0].toLowerCase() == b.games[i].hTeam.triCode.toLowerCase()) {
+                        if (b.games[i].statusNum == 1) return me.edit("That game has not started yet.");
+                        team = "h";
+                        otherTeam = "v";
+                    } else if (args[0].toLowerCase() == b.games[i].vTeam.triCode.toLowerCase()) {
+                        if (b.games[i].statusNum == 1) return me.edit("That game has not started yet.");
+                        team = "v";
+                        otherTeam = "h";
+                    } else {
+                        continue;
+                    }
+
+                    vTeam = b.games[i].vTeam.triCode;
+                    hTeam = b.games[i].hTeam.triCode;
+
+                    request({
+                        uri: "http://data.nba.net/10s/prod/v1/"+currentDate+"/"+gameId+"_boxscore.json",
+                        json: true
+                    }, (e,r,b) => {
+
+                        let description, vTeamId, hTeamId;
+
+                        vTeamId = b.basicGameData.vTeam.teamId;
+                        hTeamId = b.basicGameData.hTeam.teamId;
+
+                        embed = new Discord.RichEmbed()
+                            .setTitle("Boxscore for the game `"+vTeam+" @ "+hTeam+"`:")
+                            .setAuthor("NBABot",client.user.displayAvatarURL)
+                            .setColor(0xff4242)
+                            .setFooter("nba [command]")
+                            .setTimestamp();
+                        
+                        description = vTeam+" "+b.basicGameData.vTeam.score+" - "+b.basicGameData.hTeam.score+" "+hTeam;
+
+                        if (b.basicGameData.statusNum == 3) {
+                            description += " | FINAL";
+                        }
+
+                        description += "\n```";
+
+                        for (var i=0;i<b.stats.activePlayers.length;i++) {
+                            if ((b.stats.activePlayers[i].teamId == vTeamId && team == "v") || (b.stats.activePlayers[i].teamId == hTeamId && team == "h")) {
+                                if (b.stats.activePlayers[i].onCourt) description += b.stats.activePlayers[i].pos+" ";
+                                description += players[b.stats.activePlayers[i].personId]+": "+b.stats.activePlayers[i].points+" pts, "+b.stats.activePlayers[i].totReb+" trb, "+b.stats.activePlayers[i].assists+" ast\n" 
+                            }
+                            
+                        }
+
+                        description += "```";
+
+                        embed.setDescription(description);
+
+                        me.edit(embed);
+
+                    });
+
+                }
+            });
+            
+            break;
 
     }
 
@@ -271,8 +373,24 @@ client.on('message', async message => {
 client.on('error', console.error);
 
 setInterval(() => {
+    request({
+        uri: "http://data.nba.net/10s/prod/v1/today.json",
+        json: true
+    }, (e,r,b) => {
+        currentDate = b.links.currentDate;
+    });
+
     if (clientReady) client.user.setActivity('nba help | Serving '+client.users.size+' users among '+client.guilds.size+' servers. | nbabot.js.org | made by chig#4519', {type: 'LISTENING'});
-    dbl.postStats(client.guilds.size);
-}, 30000);
+    // dbl.postStats(client.guilds.size);
+}, 60000);
+
+setInterval(() => {
+    request({
+        uri: "http://data.nba.net/10s/prod/v1/today.json",
+        json: true
+    }, (e,r,b) => {
+        seasonScheduleYear = b.seasonScheduleYear;
+    });
+}, 86400000);
 
 client.login(secrets.token);
