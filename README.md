@@ -34,3 +34,8 @@ This command gives you some basic stats on the player. E.g. `nba player-stats de
 ![nba player-stats](https://github.com/EliotChignell/NBABot/raw/master/assets/player-stats.png)
 
 ---
+
+### `nba boxscore [team]`
+This command allows you to see the boxscore for a certain team which has played or is playing today. E.g. `nba boxscore PHX`.
+
+---

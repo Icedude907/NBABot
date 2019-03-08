@@ -81,7 +81,7 @@ client.on('message', async message => {
         case 'commands':
             sendEmbed = true;
             eTitle = "Help";
-            eDescription = "These are the command that you can use:\n```prolog\nNormal Commands\nhelp ping uptime invite vote\nNBA Commands\nscores player-info player-stats```\nTo view detailed usage, visit [nbabot.js.org](https://nbabot.js.org)\nFeel free to vote for this bot so other people hear about it [here](https://discordbots.org/bot/544017840760422417/vote).";
+            eDescription = "These are the command that you can use:\n```prolog\nNormal Commands\nhelp ping uptime invite vote\nNBA Commands\nscores player-info player-stats boxscore```\nTo view detailed usage, visit [nbabot.js.org](https://nbabot.js.org)\nFeel free to vote for this bot so other people hear about it [here](https://discordbots.org/bot/544017840760422417/vote).";
             break;
         
         case 'ping':
@@ -319,23 +319,24 @@ client.on('message', async message => {
                         hTeamId = b.basicGameData.hTeam.teamId;
 
                         embed = new Discord.RichEmbed()
-                            .setTitle("Boxscore for the game `"+vTeam+" @ "+hTeam+"`:")
+                            .setTitle(vTeam+" "+b.basicGameData.vTeam.score+" - "+b.basicGameData.hTeam.score+" "+hTeam)
                             .setAuthor("NBABot",client.user.displayAvatarURL)
                             .setColor(0xff4242)
                             .setFooter("nba [command]")
                             .setTimestamp();
                         
-                        description = vTeam+" "+b.basicGameData.vTeam.score+" - "+b.basicGameData.hTeam.score+" "+hTeam;
+                        description = "";
 
                         if (b.basicGameData.statusNum == 3) {
                             description += " | FINAL";
                         }
 
-                        description += "\n```";
+                        description += "\n```prolog\n";
 
                         for (var i=0;i<b.stats.activePlayers.length;i++) {
                             if ((b.stats.activePlayers[i].teamId == vTeamId && team == "v") || (b.stats.activePlayers[i].teamId == hTeamId && team == "h")) {
-                                if (b.stats.activePlayers[i].onCourt) description += b.stats.activePlayers[i].pos+" ";
+                                if (players[b.stats.activePlayers[i].personId].split('').includes("'")) players[b.stats.activePlayers[i].personId] = players[b.stats.activePlayers[i].personId].replace(/[&\/\\#,+()$~%.'":*?<>{}]/g,'');
+                                if (b.stats.activePlayers[i].isOnCourt) description += b.stats.activePlayers[i].pos+" ";
                                 description += players[b.stats.activePlayers[i].personId]+": "+b.stats.activePlayers[i].points+" pts, "+b.stats.activePlayers[i].totReb+" trb, "+b.stats.activePlayers[i].assists+" ast\n" 
                             }
                             
