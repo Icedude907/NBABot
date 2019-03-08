@@ -36,6 +36,14 @@ client.once('ready', () => {
         json: true
     }, (e,r,b) => {
         seasonScheduleYear = b.seasonScheduleYear;
+        request({
+            uri: 'http://data.nba.net/10s/prod/v1/'+seasonScheduleYear+'/players.json',
+            json: true
+        }, (e,r,b) => {
+            for (var i=0;i<b.league.standard.length;i++) {
+                players[b.league.standard[i].personId] = b.league.standard[i].firstName+" "+b.league.standard[i].lastName;
+            }
+        });
     });
 
     request({
@@ -45,14 +53,7 @@ client.once('ready', () => {
         currentDate = b.links.currentDate;
     });
 
-    request({
-        uri: 'http://data.nba.net/10s/prod/v1/2018/players.json',
-        json: true
-    }, (e,r,b) => {
-        for (var i=0;i<b.league.standard.length;i++) {
-            players[b.league.standard[i].personId] = b.league.standard[i].firstName+" "+b.league.standard[i].lastName;
-        }
-    });
+    
 
     client.user.setActivity('nba help | Serving '+client.users.size+' users among '+client.guilds.size+' servers. | nbabot.js.org | made by chig#4519', {type: 'LISTENING'});
 });
@@ -327,17 +328,13 @@ client.on('message', async message => {
                         
                         description = "";
 
-                        if (b.basicGameData.statusNum == 3) {
-                            description += " | FINAL";
-                        }
-
                         description += "\n```prolog\n";
 
                         for (var i=0;i<b.stats.activePlayers.length;i++) {
                             if ((b.stats.activePlayers[i].teamId == vTeamId && team == "v") || (b.stats.activePlayers[i].teamId == hTeamId && team == "h")) {
                                 if (players[b.stats.activePlayers[i].personId].split('').includes("'")) players[b.stats.activePlayers[i].personId] = players[b.stats.activePlayers[i].personId].replace(/[&\/\\#,+()$~%.'":*?<>{}]/g,'');
-                                if (b.stats.activePlayers[i].isOnCourt) description += b.stats.activePlayers[i].pos+" ";
-                                description += players[b.stats.activePlayers[i].personId]+": "+b.stats.activePlayers[i].points+" pts, "+b.stats.activePlayers[i].totReb+" trb, "+b.stats.activePlayers[i].assists+" ast\n" 
+                                // if (b.stats.activePlayers[i].isOnCourt) description += b.stats.activePlayers[i].pos+" ";
+                                description += players[b.stats.activePlayers[i].personId].split(' ')[1]+": "+b.stats.activePlayers[i].points+" pts, "+b.stats.activePlayers[i].totReb+" trb, "+b.stats.activePlayers[i].assists+" ast\n" 
                             }
                             
                         }
