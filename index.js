@@ -23,7 +23,8 @@ let clientReady = false;
 let currentScoreboard,
     currentDate,
     seasonScheduleYear,
-    players = {};
+    players = {},
+    teams = {};
 
 function msToTime(e){parseInt(e%1e3/100);var n=parseInt(e/1e3%60),r=parseInt(e/6e4%60),s=parseInt(e/36e5%24),t=parseInt(e/864e5%7);return(t=t<10?"0"+t:t)+"d:"+(s=s<10?"0"+s:s)+"h:"+(r=r<10?"0"+r:r)+"m:"+(n=n<10?"0"+n:n)+"s."}
 
@@ -42,6 +43,14 @@ client.once('ready', () => {
         }, (e,r,b) => {
             for (var i=0;i<b.league.standard.length;i++) {
                 players[b.league.standard[i].personId] = b.league.standard[i].firstName+" "+b.league.standard[i].lastName;
+            }
+        });
+        request({
+            uri: "http://data.nba.net/10s/prod/v1/"+seasonScheduleYear+"/teams.json",
+            json: true
+        }, (e,r,b) => {
+            for (var i=0;i<b.league.standard.length;i++) {
+                if (b.league.standard[i].isNBAFranchise) teams[b.league.standard[i].teamId] = b.league.standard[i];
             }
         });
     });
@@ -80,7 +89,8 @@ client.on('message', async message => {
         case 'commands':
             sendEmbed = true;
             eTitle = "Help";
-            eDescription = "These are the command that you can use:\n```prolog\nNormal Commands\nhelp ping uptime invite vote github\nNBA Commands\nscores player-info player-stats boxscore teams```\nTo view detailed usage, visit [nbabot.js.org](https://nbabot.js.org)\nFeel free to vote for this bot so other people hear about it [here](https://discordbots.org/bot/544017840760422417/vote).";
+            // eDescription = "```prolog\nNormal Commands\n'nba help' 'nba ping' 'nba uptime' 'nba invite' 'nba vote' 'nba github'\nNBA Commands\n'nba scores' - displays the scores for today.\n'nba player-info [player name]' - displays basic information about that player.\n'nba player-stats [player name]' - displays stats on that user (ppg, trb, apg, etc).\n'nba boxscore [team]' - displays the boxscore for that team.\n'nba teams' - displays the teams, more specifically the codes which I use for this bot, nicknames are coming soon.\n'nba standings' - displays the league-wide standings.\n'nba standings west' - displays the standings for the western conference.\n'nba standings east' - displays the standings for the eastern conference.```";
+            eDescription = "These are the command that you can use:\n```prolog\nNormal Commands\nhelp ping uptime invite vote github\nNBA Commands\nscores player-info player-stats boxscore teams standings```\nTo view detailed usage, visit [nbabot.js.org](https://nbabot.js.org)\nFeel free to vote for this bot so other people hear about it [here](https://discordbots.org/bot/544017840760422417/vote).";
             break;
         
         case 'ping':
@@ -360,32 +370,126 @@ client.on('message', async message => {
             
             break;
 
+        
         case 'teams':
             
             me = await message.channel.send("Loading...");
 
-            request({
-                uri: "http://data.nba.net/10s/prod/v1/"+seasonScheduleYear+"/teams.json",
-                json: true
-            }, (e,r,b) => {
-            	embed = new Discord.RichEmbed()
-                    .setTitle("Teams for the "+seasonScheduleYear+"/"+(parseInt(seasonScheduleYear)+1)+" season:")
-                    .setAuthor("NBABot",client.user.displayAvatarURL)
-                    .setColor(0xff4242)
-                    .setFooter("nba [command]")
-                    .setTimestamp();
+            embed = new Discord.RichEmbed()
+                .setTitle("Teams for the "+seasonScheduleYear+"/"+(parseInt(seasonScheduleYear)+1)+" season:")
+                .setAuthor("NBABot",client.user.displayAvatarURL)
+                .setColor(0xff4242)
+                .setFooter("nba [command]")
+                .setTimestamp();
 
-                let cDescription = "";
-                for (var i=0;i<b.league.vegas.length;i++) {
-                	cDescription += "`"+b.league.vegas[i].tricode+"` ";
-                }
-
-                embed.setDescription(cDescription);
-                me.edit(embed);
-            });
+            let cDescription = "";
+            for (var key in teams) {
+                cDescription += "`"+teams[key].tricode+"` ";
+            }
+            embed.setDescription(cDescription);
+            me.edit(embed);
 
             break;
+        
+        case 'standings':
 
+            me = await message.channel.send("Loading...");
+            
+            if (!args[0]) {
+                // League Standings
+                request({
+                    uri: "http://data.nba.net/10s/prod/v1/current/standings_all_no_sort_keys.json",
+                    json: true
+                }, (e,r,b) => {
+                    embed = new Discord.RichEmbed()
+                        .setTitle("League Standings:")
+                        .setAuthor("NBABot",client.user.displayAvatarURL)
+                        .setColor(0xff4242)
+                        .setFooter("nba [command]")
+                        .setTimestamp();
+
+                    let sDescription = "`";
+
+                    for (var i=0;i<b.league.standard.teams.length;i++) {
+                        if (i <= 8) {
+                            sDescription += "0"+(i+1)+". ";
+                        } else {
+                            sDescription += (i+1)+". ";
+                        } // b.league.standard.teams[i]
+                        sDescription += " "+teams[b.league.standard.teams[i].teamId].tricode+" "+b.league.standard.teams[i].win+"-"+b.league.standard.teams[i].loss+" ("+b.league.standard.teams[i].winPct+")\n";
+                    }
+                    
+                    sDescription += "`\nYou can use `nba standings west` or `nba standings east` too.";
+
+                    embed.setDescription(sDescription);
+                    me.edit(embed);
+                });
+            } else if (args[0].toLowerCase() == "west" || args[0].toLowerCase() == "w") {
+                // West Standings
+                request({
+                    uri: "http://data.nba.net/10s/prod/v1/current/standings_conference.json",
+                    json: true
+                }, (e,r,b) => {
+                    embed = new Discord.RichEmbed()
+                        .setTitle("West Standings:")
+                        .setAuthor("NBABot",client.user.displayAvatarURL)
+                        .setColor(0xff4242)
+                        .setFooter("nba [command]")
+                        .setTimestamp();
+
+                    let sDescription = "`";
+
+                    for (var i=0;i<b.league.standard.conference.west.length;i++) {
+                        if (i <= 8) {
+                            sDescription += "0"+(i+1)+". ";
+                        } else {
+                            sDescription += (i+1)+". ";
+                        }
+                        sDescription += " "+teams[b.league.standard.conference.west[i].teamId].tricode+" "+b.league.standard.conference.west[i].win+"-"+b.league.standard.conference.west[i].loss+" ("+b.league.standard.conference.west[i].winPct+")\n";
+                    }
+
+                    sDescription += "`";
+
+                    embed.setDescription(sDescription);
+                    me.edit(embed);
+                    
+                });
+            } else if (args[0].toLowerCase() == "east" || args[0].toLowerCase() == "e") {
+                // East Standings
+                request({
+                    uri: "http://data.nba.net/10s/prod/v1/current/standings_conference.json",
+                    json: true
+                }, (e,r,b) => {
+                    embed = new Discord.RichEmbed()
+                        .setTitle("East Standings:")
+                        .setAuthor("NBABot",client.user.displayAvatarURL)
+                        .setColor(0xff4242)
+                        .setFooter("nba [command]")
+                        .setTimestamp();
+
+                    let sDescription = "`";
+
+                    for (var i=0;i<b.league.standard.conference.east.length;i++) {
+                        if (i <= 8) {
+                            sDescription += "0"+(i+1)+". ";
+                        } else {
+                            sDescription += (i+1)+". ";
+                        }
+                        sDescription += " "+teams[b.league.standard.conference.east[i].teamId].tricode+" "+b.league.standard.conference.east[i].win+"-"+b.league.standard.conference.east[i].loss+" ("+b.league.standard.conference.east[i].winPct+")\n";
+                    }
+
+                    sDescription += "`";
+
+                    embed.setDescription(sDescription);
+                    me.edit(embed);
+                    
+                });
+            } else {
+                // Invalid
+                me.edit("Please use the command correctly. E.g. `nba standings west` or `nba standings east` or `nba standings` (full league standings).");
+            }
+            break;
+        
     }
 
     if (sendEmbed) {

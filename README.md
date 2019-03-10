@@ -15,6 +15,8 @@ This command shows you how long the current session of NBABot has been online fo
 This command allows you to invite NBABot to your servers by clicking the link.
 #### `nba vote`
 This command gives you the link to vote for NBABot.
+#### `nba github`
+This command shows you the link for the [NBABot GitHub](https://github.com/EliotChignell/NBABot)
 ### NBA Commands
 `nba predictions` and `nba predict` are coming soon...
 #### `nba scores`
@@ -37,5 +39,25 @@ This command gives you some basic stats on the player. E.g. `nba player-stats de
 
 #### `nba boxscore [team]`
 This command allows you to see the boxscore for a certain team which has played or is playing today. E.g. `nba boxscore PHX`.
+
+---
+
+#### `nba teams`
+This command shows you the teams in the current season.
+
+---
+
+#### `nba standings`
+This command displays the standings for the NBA.
+
+---
+
+#### `nba standings west`
+This command displays the standings for the western conference of the NBA.
+
+---
+
+#### `nba standings east` 
+This command displays the standings for the eastern conference of the NBA.
 
 ---
