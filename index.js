@@ -53,8 +53,6 @@ client.once('ready', () => {
         currentDate = b.links.currentDate;
     });
 
-    
-
     client.user.setActivity('nba help | Serving '+client.users.size+' users among '+client.guilds.size+' servers. | nbabot.js.org | made by chig#4519', {type: 'LISTENING'});
 });
 
@@ -82,7 +80,7 @@ client.on('message', async message => {
         case 'commands':
             sendEmbed = true;
             eTitle = "Help";
-            eDescription = "These are the command that you can use:\n```prolog\nNormal Commands\nhelp ping uptime invite vote\nNBA Commands\nscores player-info player-stats boxscore```\nTo view detailed usage, visit [nbabot.js.org](https://nbabot.js.org)\nFeel free to vote for this bot so other people hear about it [here](https://discordbots.org/bot/544017840760422417/vote).";
+            eDescription = "These are the command that you can use:\n```prolog\nNormal Commands\nhelp ping uptime invite vote github\nNBA Commands\nscores player-info player-stats boxscore teams```\nTo view detailed usage, visit [nbabot.js.org](https://nbabot.js.org)\nFeel free to vote for this bot so other people hear about it [here](https://discordbots.org/bot/544017840760422417/vote).";
             break;
         
         case 'ping':
@@ -106,6 +104,10 @@ client.on('message', async message => {
 			sendEmbed = true;
 			eTitle = "Vote for NBABot";
 			eDescription = "NBABot is and will be completely free. To support this bot, add it to your discord servers and make sure to vote for my bot as much as possible so it gains popularity and more people discover this bot.\nhttps://discordbots.org/bot/544017840760422417/vote";
+			break;
+
+		case 'github':
+			message.channel.send("https://github.com/EliotChignell/NBABot");
 			break;
 
         case 'eval':
@@ -285,6 +287,8 @@ client.on('message', async message => {
             
             if (!args[0]) return me.edit("Please specify a team. E.g. `nba boxscore PHX`.");
 
+            let gameFound = false;
+
             request({
                 uri: "http://data.nba.net/10s/prod/v1/"+currentDate+"/scoreboard.json",
                 json: true
@@ -295,10 +299,12 @@ client.on('message', async message => {
                     gameId = b.games[i].gameId;
 
                     if (args[0].toLowerCase() == b.games[i].hTeam.triCode.toLowerCase()) {
+                        gameFound = true;
                         if (b.games[i].statusNum == 1) return me.edit("That game has not started yet.");
                         team = "h";
                         otherTeam = "v";
                     } else if (args[0].toLowerCase() == b.games[i].vTeam.triCode.toLowerCase()) {
+                        gameFound = true;
                         if (b.games[i].statusNum == 1) return me.edit("That game has not started yet.");
                         team = "v";
                         otherTeam = "h";
@@ -348,8 +354,36 @@ client.on('message', async message => {
                     });
 
                 }
+            }).then(() => {
+                if (!gameFound) return me.edit("That team aren't playing today or that team doesn't exist.");
             });
             
+            break;
+
+        case 'teams':
+            
+            me = await message.channel.send("Loading...");
+
+            request({
+                uri: "http://data.nba.net/10s/prod/v1/"+seasonScheduleYear+"/teams.json",
+                json: true
+            }, (e,r,b) => {
+            	embed = new Discord.RichEmbed()
+                    .setTitle("Teams for the "+seasonScheduleYear+"/"+(parseInt(seasonScheduleYear)+1)+" season:")
+                    .setAuthor("NBABot",client.user.displayAvatarURL)
+                    .setColor(0xff4242)
+                    .setFooter("nba [command]")
+                    .setTimestamp();
+
+                let cDescription = "";
+                for (var i=0;i<b.league.vegas.length;i++) {
+                	cDescription += "`"+b.league.vegas[i].tricode+"` ";
+                }
+
+                embed.setDescription(cDescription);
+                me.edit(embed);
+            });
+
             break;
 
     }
