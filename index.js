@@ -2,7 +2,7 @@
 const Discord = require('discord.js');
 const request = require('request-promise');
 const Enmap = require('enmap');
-// const DiscordBotList = require('dblapi.js');
+const DiscordBotList = require('dblapi.js');
 
 // JSON Files
 const secrets = require('./secrets.json');
@@ -10,7 +10,7 @@ const secrets = require('./secrets.json');
 // Client
 const client = new Discord.Client();
 
-// const dbl = new DiscordBotList(secrets.dbl);
+const dbl = new DiscordBotList(secrets.dbl);
 
 // Prefix
 const prefix = "nba ";
@@ -172,7 +172,14 @@ client.on('message', async message => {
                     } else if (b.games[i].nugget.text) {
                     	str2 += "\n"+b.games[i].nugget.text;
                     }
-                    embed.addField(str, str2);
+                    console.log(str, str2);
+                    try {
+                 		embed.addField(str, str2);   	
+   
+                    } catch (e) {
+                    	continue;
+                    }
+                    // if (str != "" && str2 != "") embed.addField(str, str2);
                     
                 }
                 me.edit(embed);
@@ -416,7 +423,7 @@ client.on('message', async message => {
                         } else {
                             sDescription += (i+1)+". ";
                         } // b.league.standard.teams[i]
-                        sDescription += " "+teams[b.league.standard.teams[i].teamId].tricode+" "+b.league.standard.teams[i].win+"-"+b.league.standard.teams[i].loss+" ("+b.league.standard.teams[i].winPct+")\n";
+                        sDescription += " "+teams[b.league.standard.teams[i].teamId].tricode+" "+b.league.standard.teams[i].win+"-"+b.league.standard.teams[i].loss+" ("+b.league.standard.teams[i].winPct+") GB: "+b.league.standard.teams[i].gamesBehind+"\n";
                     }
                     
                     sDescription += "`\nYou can use `nba standings west` or `nba standings east` too.";
@@ -517,7 +524,7 @@ setInterval(() => {
     });
 
     if (clientReady) client.user.setActivity('nba help | Serving '+client.users.size+' users among '+client.guilds.size+' servers. | nbabot.js.org | made by chig#4519', {type: 'LISTENING'});
-    // dbl.postStats(client.guilds.size);
+    dbl.postStats(client.guilds.size);
 }, 60000);
 
 setInterval(() => {
