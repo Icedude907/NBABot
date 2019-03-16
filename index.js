@@ -160,7 +160,7 @@ client.on('message', async message => {
                     	if (new Date(b.games[i].startTimeUTC).getTime()-new Date().getTime() < 0) {
                     		str2 += "Starting soon"
                     	} else {
-                    		str2 += "Starts in "+msToTime(new Date(b.games[i].startTimeUTC).getTime()-new Date().getTime());
+                    		str2 += "Starts in `"+msToTime(new Date(b.games[i].startTimeUTC).getTime()-new Date().getTime())+"`";
                     	}
                     } else if (b.games[i].statusNum == 2) {
                         str += " | Q"+b.games[i].period.current+" "+b.games[i].clock;
