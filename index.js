@@ -3,6 +3,9 @@ const Discord = require('discord.js');
 const request = require('request-promise');
 const Enmap = require('enmap');
 const DiscordBotList = require('dblapi.js');
+const BOATS = require("boats.js");
+
+const Boats = new BOATS("KmiRDCncr5cg6KnYVmDjJY5uHSKkom7wrarJvwp78nnYyUTfMSTzFSBSsH0f5oYpJL3QPu6lOEkVHOV919tEs1LQPae0zKm9OSVCQHlP5ZEo3hJk8RB7Du7w8Q45sgKq0RzD1x1TGAjRFT7Lz14v1DyPqPA");
 
 // JSON Files
 const secrets = require('./secrets.json');
@@ -62,7 +65,7 @@ client.once('ready', () => {
         currentDate = b.links.currentDate;
     });
 
-    client.user.setActivity('nba help | Serving '+client.users.size+' users among '+client.guilds.size+' servers. | nbabot.js.org | made by chig#4519', {type: 'LISTENING'});
+    client.user.setActivity('nba help | nbabot.js.org', {type: 'LISTENING'});
 });
 
 client.on('message', async message => {
@@ -523,7 +526,7 @@ setInterval(() => {
         currentDate = b.links.currentDate;
     });
 
-    if (clientReady) client.user.setActivity('nba help | Serving '+client.users.size+' users among '+client.guilds.size+' servers. | nbabot.js.org | made by chig#4519', {type: 'LISTENING'});
+	Boats.postStats(client.guilds.size, "544017840760422417");
     dbl.postStats(client.guilds.size);
 }, 60000);
 
