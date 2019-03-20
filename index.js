@@ -69,7 +69,7 @@ client.once('ready', () => {
 });
 
 client.on('message', async message => {
-    console.log(message.content);
+    
     if (message.content.split(' ')[0].toLowerCase() != "nba" || message.author.bot) return;
   
 	  // Logging user messages
@@ -134,7 +134,7 @@ client.on('message', async message => {
 			break;
 
 		case 'github':
-			message.channel.send("https://github.com/EliotChignell/NBABot");
+			message.channel.send("**https://github.com/EliotChignell/NBABot**");
             break;
             
         case 'bot-stats':
@@ -541,6 +541,17 @@ client.on('message', async message => {
 });
 
 client.on('error', console.error);
+
+client.on("guildCreate", g => {
+    console.log("[JOINED] "+g.name+", "+g.members.size+" members.");
+    client.users.get("401649168948396032").send("[JOINED] "+g.name+", "+g.members.size+" members.");
+    g.channels.find(c => c.name == "general").send("**Thank you for adding me to your server! Check out https://nbabot.js.org for the available commands.**");
+});
+
+client.on("guildDelete", g => {
+    console.log("[LEFT] "+g.name+", "+g.members.size+" members.");
+    client.users.get("401649168948396032").send("[LEFT] "+g.name+", "+g.members.size+" members.");
+});
 
 setInterval(() => {
     request({
