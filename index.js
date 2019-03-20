@@ -69,12 +69,14 @@ client.once('ready', () => {
 });
 
 client.on('message', async message => {
+    console.log(message.content);
     if (message.content.split(' ')[0].toLowerCase() != "nba" || message.author.bot) return;
-
-	// Logging user messages
+  
+	  // Logging user messages
     console.log(message.guild.name+' ('+message.author.tag+') '+message.content);
 
     const args = message.content.slice(prefix.length).split(' ');
+    // const args = message.content.split(' ').shift()
     const command = args.shift().toLowerCase();
 
     let sendEmbed = false,
