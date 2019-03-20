@@ -5,10 +5,10 @@ const Enmap = require('enmap');
 const DiscordBotList = require('dblapi.js');
 const BOATS = require("boats.js");
 
-const Boats = new BOATS("KmiRDCncr5cg6KnYVmDjJY5uHSKkom7wrarJvwp78nnYyUTfMSTzFSBSsH0f5oYpJL3QPu6lOEkVHOV919tEs1LQPae0zKm9OSVCQHlP5ZEo3hJk8RB7Du7w8Q45sgKq0RzD1x1TGAjRFT7Lz14v1DyPqPA");
-
 // JSON Files
 const secrets = require('./secrets.json');
+
+const Boats = new BOATS(secrets.boats);
 
 // Client
 const client = new Discord.Client();
@@ -90,11 +90,22 @@ client.on('message', async message => {
         
         case 'help':
         case 'commands':
-            sendEmbed = true;
-            eTitle = "Help";
+
+        	embed = new Discord.RichEmbed()
+	              .setTitle("Stats on NBABot:")
+	              .setAuthor("NBABot",client.user.displayAvatarURL)
+	              .setColor(0xff4242)
+	              .setFooter("nba [command]")
+	              .setTimestamp()
+	              .addField("NBA Commands","`scores player-info player-stats boxscore teams standings`")
+	              .addField("Other Commands","`help ping uptime invite vote github bot-stats`")
+	              .setDescription("To view detailed usage, visit [nbabot.js.org](https://nbabot.js.org/)")
+	              message.channel.send(embed);
+            // sendEmbed = true;
+            // eTitle = "Help";
             // eDescription = "```prolog\nNormal Commands\n'nba help' 'nba ping' 'nba uptime' 'nba invite' 'nba vote' 'nba github'\nNBA Commands\n'nba scores' - displays the scores for today.\n'nba player-info [player name]' - displays basic information about that player.\n'nba player-stats [player name]' - displays stats on that user (ppg, trb, apg, etc).\n'nba boxscore [team]' - displays the boxscore for that team.\n'nba teams' - displays the teams, more specifically the codes which I use for this bot, nicknames are coming soon.\n'nba standings' - displays the league-wide standings.\n'nba standings west' - displays the standings for the western conference.\n'nba standings east' - displays the standings for the eastern conference.```";
             // eDescription = "These are the command that you can use:\n```prolog\nNormal Commands\nhelp ping uptime invite vote github\nNBA Commands\nscores player-info player-stats boxscore teams standings```\nTo view detailed usage, visit [nbabot.js.org](https://nbabot.js.org)\nFeel free to vote for this bot so other people hear about it [here](https://discordbots.org/bot/544017840760422417/vote).";
-            eDescription = "NBA Commands:\n`scores player-info player-stats boxscore teams standings`\nOther Commands:\n`help ping uptime invite vote github bot-stats`\n_To view detailed usage, visit [nbabot.js.org](https://nbabot.js.org/)._";
+            // eDescription = "**NBA Commands**:\n`scores player-info player-stats boxscore teams standings`\n\n**Other Commands**:\n`help ping uptime invite vote github bot-stats`\n_To view detailed usage, visit [nbabot.js.org](https://nbabot.js.org/)._";
             break;
         
         case 'ping':
@@ -143,12 +154,9 @@ client.on('message', async message => {
 
         case 'servers':
         	if (message.author.id == 401649168948396032) {
-        		let strServers = '```';
         		client.guilds.forEach(g => {
-        			strServers += g.name+", "+g.members.size+"\n";
+        			message.author.send(g.name+" "+g.members.size);
         		});
-        		strServers += "```";
-        		message.author.send(strServers);
         	}
         	break;
 
