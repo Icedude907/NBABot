@@ -29,7 +29,41 @@ let currentScoreboard,
     currentDate,
     seasonScheduleYear,
     players = {},
-    teams = {};
+    teams = {},
+    jerseyNumbers = {};
+
+const teamLogoURLs = {
+    ATL: "http://loodibee.com/wp-content/uploads/nba-atlanta-hawks-logo-300x300.png",
+    BOS: "http://loodibee.com/wp-content/uploads/nba-boston-celtics-logo-300x300.png",
+    BKN: "http://loodibee.com/wp-content/uploads/nba-brooklyn-nets-logo-300x300.png",
+    CHA: "http://loodibee.com/wp-content/uploads/nba-charlotte-hornets-logo-300x300.png",
+    CHI: "http://loodibee.com/wp-content/uploads/nba-chicago-bulls-logo-300x300.png",
+    CLE: "http://loodibee.com/wp-content/uploads/nba-cleveland-cavaliers-logo-300x300.png",
+    DAL: "http://loodibee.com/wp-content/uploads/nba-dallas-mavericks-logo-300x300.png",
+    DEN: "http://loodibee.com/wp-content/uploads/nba-denver-nuggets-logo-2018-300x300.png",
+    DET: "http://loodibee.com/wp-content/uploads/nba-detroit-pistons-logo-300x300.png",
+    GSW: "http://loodibee.com/wp-content/uploads/nba-golden-state-warriors-logo-300x300.png",
+    HOU: "http://loodibee.com/wp-content/uploads/nba-houston-rockets-logo-300x300.png",
+    IND: "http://loodibee.com/wp-content/uploads/nba-indiana-pacers-logo-300x300.png",
+    LAC: "http://loodibee.com/wp-content/uploads/nba-la-clippers-logo-png-300x300.png",
+    LAL: "http://loodibee.com/wp-content/uploads/nba-los-angeles-lakers-logo-300x300.png",
+    MEM: "http://loodibee.com/wp-content/uploads/nba-memphis-grizzlies-logo-300x300.png",
+    MIA: "http://loodibee.com/wp-content/uploads/nba-miami-heat-logo-300x300.png",
+    MIL: "http://loodibee.com/wp-content/uploads/nba-milwaukee-bucks-logo-300x300.png",
+    MIN: "http://loodibee.com/wp-content/uploads/nba-minnesota-timberwolves-logo-300x300.png",
+    NOP: "http://loodibee.com/wp-content/uploads/nba-new-orleans-pelicans-logo-300x300.png",
+    NYK: "http://loodibee.com/wp-content/uploads/nba-new-york-knicks-logo-300x300.png",
+    OKC: "http://loodibee.com/wp-content/uploads/nba-oklahoma-city-thunder-logo-300x300.png",
+    ORL: "http://loodibee.com/wp-content/uploads/nba-orlando-magic-logo-300x300.png",
+    PHI: "http://loodibee.com/wp-content/uploads/nba-philadelphia-76ers-logo-300x300.png",
+    PHX: "http://loodibee.com/wp-content/uploads/nba-phoenix-suns-logo-300x300.png",
+    POR: "http://loodibee.com/wp-content/uploads/nba-portland-trail-blazers-logo-300x300.png",
+    SAC: "http://loodibee.com/wp-content/uploads/nba-sacramento-kings-logo-300x300.png",
+    SAS: "http://loodibee.com/wp-content/uploads/nba-san-antonio-spurs-logo-300x300.png",
+    TOR: "http://loodibee.com/wp-content/uploads/nba-toronto-raptors-logo-300x300.png",
+    UTA: "http://loodibee.com/wp-content/uploads/nba-utah-jazz-logo-300x300.png",
+    WAS: "http://loodibee.com/wp-content/uploads/nba-washington-wizards-logo-300x300.png",
+}
 
 function msToTime(e) {
     parseInt(e % 1e3 / 100);
@@ -63,6 +97,7 @@ client.once('ready', () => {
         }, (e, r, b) => {
             for (var i = 0; i < b.league.standard.length; i++) {
                 players[b.league.standard[i].personId] = b.league.standard[i].firstName + " " + b.league.standard[i].lastName;
+                jerseyNumbers[b.league.standard[i].personId] = b.league.standard[i].jersey;
             }
         });
         request({
@@ -218,7 +253,7 @@ client.on('message', async message => {
                     } else if (b.games[i].nugget.text) {
                         str2 += "\n" + b.games[i].nugget.text;
                     }
-                    console.log(str, str2);
+                    // console.log(str, str2);
                     try {
                         embed.addField(str, str2);
 
@@ -245,15 +280,23 @@ client.on('message', async message => {
                 for (var i = 0; i < b.league.standard.length; i++) {
                     if (b.league.standard[i].firstName.toLowerCase() == args[0].toLowerCase() && b.league.standard[i].lastName.toLowerCase() == args[1].toLowerCase()) {
                         playerFound = true;
-                        let draftStr = "`#" + b.league.standard[i].draft.pickNum + " (" + b.league.standard[i].draft.seasonYear + ")`";
-                        if (draftStr == "`# ()`") draftStr = "`Undrafted`";
+                        let draftStr = "#" + b.league.standard[i].draft.pickNum + " (" + b.league.standard[i].draft.seasonYear + ")";
+                        if (draftStr == "# ()") draftStr = "Undrafted";
                         let embed = new Discord.RichEmbed()
                             .setTitle("Basic Information on the player `" + b.league.standard[i].firstName + " " + b.league.standard[i].lastName + "`:")
                             .setAuthor("NBABot", client.user.displayAvatarURL)
                             .setColor(0xff4242)
-                            .setDescription("Jersey Number: `" + b.league.standard[i].jersey + "`\nPosition: `" + b.league.standard[i].pos + "`\nHeight: `" + b.league.standard[i].heightFeet + "'" + b.league.standard[i].heightInches + '" (' + b.league.standard[i].heightMeters + "m)`\nWeight: `" + b.league.standard[i].weightKilograms + "kg`\nDate of Birth: `" + b.league.standard[i].dateOfBirthUTC + "`\nDrafted: " + draftStr + "\n\n_Type `nba player-stats " + args[0] + " " + args[1] + "` to view stats on that player._")
+                            // .setDescription("Jersey Number: `" + b.league.standard[i].jersey + "`\nPosition: `" + b.league.standard[i].pos + "`\nHeight: `" + b.league.standard[i].heightFeet + "'" + b.league.standard[i].heightInches + '" (' + b.league.standard[i].heightMeters + "m)`\nWeight: `" + b.league.standard[i].weightKilograms + "kg`\nDate of Birth: `" + b.league.standard[i].dateOfBirthUTC + "`\nDrafted: " + draftStr + "\n\n_Type `nba player-stats " + args[0] + " " + args[1] + "` to view stats on that player._")
                             .setFooter("nba [command]")
-                            .setTimestamp();
+                            .setTimestamp()
+                            .addField("Jersey Number", b.league.standard[i].jersey, true)
+                            .addField("Position", b.league.standard[i].pos, true)
+                            .addField("Height", b.league.standard[i].heightFeet + "'" + b.league.standard[i].heightInches + '" (' + b.league.standard[i].heightMeters + "m", true)
+                            .addField("Weight", b.league.standard[i].weightKilograms, true)
+                            .addField("Date of Birth", b.league.standard[i].dateOfBirthUTC, true)
+                            .addField("Drafted", draftStr, true)
+                            .addField("...", "Type `nba player-stats " + args.join(' ') + "` to view stats on that player.");
+
                         return me.edit(embed);
 
                         break;
@@ -289,7 +332,17 @@ client.on('message', async message => {
                                 .setTitle("Stats on the player `" + playerName + "`:")
                                 .setAuthor("NBABot", client.user.displayAvatarURL)
                                 .setColor(0xff4242)
-                                .setDescription("PPG: `" + player.ppg + "`\nAPG: `" + player.apg + "`\nRPG: `" + player.rpg + "`\nMPG: `" + player.mpg + "`\nTOPG: `" + player.topg + "`\nSPG: `" + player.spg + "`\nFT%: `" + player.ftp + "%`\nFG%: `" + player.fgp + "%`\n+/-: `" + player.plusMinus + "`\n\n_Type `nba player-info " + args[0] + " " + args[1] + "` to view info on that player._")
+                                // .setDescription("PPG: `" + player.ppg + "`\nAPG: `" + player.apg + "`\nRPG: `" + player.rpg + "`\nMPG: `" + player.mpg + "`\nTOPG: `" + player.topg + "`\nSPG: `" + player.spg + "`\nFT%: `" + player.ftp + "%`\nFG%: `" + player.fgp + "%`\n+/-: `" + player.plusMinus + "`\n\n_Type `nba player-info " + args[0] + " " + args[1] + "` to view info on that player._")
+                                .addField("PPG", player.ppg, true)
+                                .addField("APG", player.apg, true)
+                                .addField("RPG", player.rpg, true)
+                                .addField("MPG", player.mpg, true)
+                                .addField("TOPG", player.topg, true)
+                                .addField("SPG", player.spg, true)
+                                .addField("FT%", player.ftp, true)
+                                .addField("FG%", player.fgp, true)
+                                .addField("Total +/-", player.plusMinus, true)
+                                .addField("...", "Type `nba player-info " + args.join(" ") + "` to view basic information on that player.")
                                 .setFooter("nba [command]")
                                 .setTimestamp();
                             return me.edit(embed);
@@ -357,9 +410,11 @@ client.on('message', async message => {
                 json: true
             }, (e, r, b) => {
                 for (var i = 0; i < b.games.length; i++) {
-                    let team, otherTeam, vTeam, hTeam, gameId;
+                    let team, otherTeam, vTeam, hTeam, gameId, gameStartedAt;
 
                     gameId = b.games[i].gameId;
+                    let randomDateObject = new Date(b.games[i].startTimeUTC);
+                    gameStartedAt = randomDateObject.getFullYear()+"-"+(randomDateObject.getMonth()+1)+"-"+randomDateObject.getDate();
 
                     if (args[0].toLowerCase() == b.games[i].hTeam.triCode.toLowerCase()) {
                         gameFound = true;
@@ -389,28 +444,38 @@ client.on('message', async message => {
                         hTeamId = b.basicGameData.hTeam.teamId;
 
                         embed = new Discord.RichEmbed()
-                            .setTitle(vTeam + " " + b.basicGameData.vTeam.score + " - " + b.basicGameData.hTeam.score + " " + hTeam)
+                            .setTitle(vTeam + " " + b.basicGameData.vTeam.score + " - " + b.basicGameData.hTeam.score + " " + hTeam + "\nGame Played on `"+gameStartedAt+"`")
                             .setAuthor("NBABot", client.user.displayAvatarURL)
                             .setColor(0xff4242)
                             .setFooter("nba [command]")
                             .setTimestamp();
 
-                        description = "";
+                        if (team == "h") embed.setThumbnail(teamLogoURLs[hTeam]);
+                        if (team == "v") embed.setThumbnail(teamLogoURLs[vTeam]);
 
-                        description += "\n```prolog\n";
+                        // description = "";
+
+                        // description += "\n```prolog\n";
+                        let playerNames = "";
+                        let playerStats = "";
 
                         for (var i = 0; i < b.stats.activePlayers.length; i++) {
                             if ((b.stats.activePlayers[i].teamId == vTeamId && team == "v") || (b.stats.activePlayers[i].teamId == hTeamId && team == "h")) {
                                 if (players[b.stats.activePlayers[i].personId].split('').includes("'")) players[b.stats.activePlayers[i].personId] = players[b.stats.activePlayers[i].personId].replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '');
                                 // if (b.stats.activePlayers[i].isOnCourt) description += b.stats.activePlayers[i].pos+" ";
-                                description += players[b.stats.activePlayers[i].personId].split(' ')[1] + ": " + b.stats.activePlayers[i].points + " pts, " + b.stats.activePlayers[i].totReb + " trb, " + b.stats.activePlayers[i].assists + " ast\n"
+                                // description += players[b.stats.activePlayers[i].personId].split(' ')[1] + ": " + b.stats.activePlayers[i].points + " pts, " + b.stats.activePlayers[i].totReb + " trb, " + b.stats.activePlayers[i].assists + " ast\n"
+                                playerNames += players[b.stats.activePlayers[i].personId] + "\n";
+                                playerStats += b.stats.activePlayers[i].points + " / " + b.stats.activePlayers[i].totReb + " / " + b.stats.activePlayers[i].assists + "\n";
                             }
 
                         }
 
-                        description += "```";
+                        embed.addField("Player", playerNames, true);
+                        embed.addField("Pts/Trb/Ast", playerStats, true);
 
-                        embed.setDescription(description);
+                        // description += "```";
+
+                        // embed.setDescription(description);
 
                         me.edit(embed);
 
@@ -543,36 +608,44 @@ client.on('message', async message => {
             }
             break;
 
-            case 'roster':
+        case 'roster':
 
-                me = await message.channel.send("Loading...");
+            me = await message.channel.send("Loading...");
 
-                if (!args[0] || !swap(teams)[args[0].toUpperCase()]) return me.edit("Please specify a team. E.g. `nba roster PHX`.");
+            if (!args[0] || !swap(teams)[args[0].toUpperCase()]) return me.edit("Please specify a team. E.g. `nba roster PHX`.");
 
-                let teamIdd = swap(teams)[args[0].toUpperCase()];
+            let teamIdd = swap(teams)[args[0].toUpperCase()];
 
-                request({
-                    uri: "http://data.nba.net/10s/prod/v1/"+seasonScheduleYear+"/teams/"+teamIdd+"/roster.json",
-                    json: true
-                }, (e,r,b) => {
-                    embed = new Discord.RichEmbed()
-                        .setTitle("Roster for the "+(seasonScheduleYear+"-"+(parseInt(seasonScheduleYear)+1))+" team of "+args[0].toUpperCase()+":")
-                        .setAuthor("NBABot", client.user.displayAvatarURL)
-                        .setColor(0xff4242)
-                        .setFooter("nba [command]")
-                        .setTimestamp();
-                    eDescription = "`";
+            request({
+                uri: "http://data.nba.net/10s/prod/v1/" + seasonScheduleYear + "/teams/" + teamIdd + "/roster.json",
+                json: true
+            }, (e, r, b) => {
+                embed = new Discord.RichEmbed()
+                    .setTitle("Roster for the " + (seasonScheduleYear + "-" + (parseInt(seasonScheduleYear) + 1)) + " team of " + args[0].toUpperCase() + ":")
+                    .setAuthor("NBABot", client.user.displayAvatarURL)
+                    .setColor(0xff4242)
+                    .setFooter("nba [command]")
+                    .setThumbnail(teamLogoURLs[teams[teamIdd].tricode])
+                    .setTimestamp();
+                eDescription = "`";
+                let playerNumbers = "";
+                let playerNamez = "";
 
-                    for (var i=0;i<b.league.standard.players.length;i++) {
-                        eDescription += players[b.league.standard.players[i].personId]+"\n";
-                    }
+                for (var i = 0; i < b.league.standard.players.length; i++) {
+                    playerNamez += players[b.league.standard.players[i].personId] + "\n";
+                    playerNumbers += jerseyNumbers[b.league.standard.players[i].personId] + "\n";
+                }
 
-                    eDescription += "`";
-                    embed.setDescription(eDescription);
-                    me.edit(embed);
-                });
+                eDescription += "`";
+                // embed.setDescription(eDescription);
+                embed.addField("Number",playerNumbers, true);
+                embed.addField("Name",playerNamez, true);
+                me.edit(embed);
+            });
 
-                break;
+            break;
+
+
 
     }
 
