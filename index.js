@@ -117,9 +117,7 @@ client.once('ready', () => {
         currentDate = b.links.currentDate;
     });
 
-    client.user.setActivity('nba help | nbabot.js.org', {
-        type: 'LISTENING'
-    });
+    client.user.setActivity("nba help | nbabot.js.org | "+client.guilds.size+" servers", {type: "PLAYING"});
 });
 
 client.on('message', async message => {
@@ -414,7 +412,7 @@ client.on('message', async message => {
 
                     gameId = b.games[i].gameId;
                     let randomDateObject = new Date(b.games[i].startTimeUTC);
-                    gameStartedAt = randomDateObject.getFullYear()+"-"+(randomDateObject.getMonth()+1)+"-"+randomDateObject.getDate();
+                    gameStartedAt = randomDateObject.getFullYear() + "-" + (randomDateObject.getMonth() + 1) + "-" + randomDateObject.getDate();
 
                     if (args[0].toLowerCase() == b.games[i].hTeam.triCode.toLowerCase()) {
                         gameFound = true;
@@ -444,7 +442,7 @@ client.on('message', async message => {
                         hTeamId = b.basicGameData.hTeam.teamId;
 
                         embed = new Discord.RichEmbed()
-                            .setTitle(vTeam + " " + b.basicGameData.vTeam.score + " - " + b.basicGameData.hTeam.score + " " + hTeam + "\nGame Played on `"+gameStartedAt+"`")
+                            .setTitle(vTeam + " " + b.basicGameData.vTeam.score + " - " + b.basicGameData.hTeam.score + " " + hTeam + "\nGame Played on `" + gameStartedAt + "`")
                             .setAuthor("NBABot", client.user.displayAvatarURL)
                             .setColor(0xff4242)
                             .setFooter("nba [command]")
@@ -453,29 +451,29 @@ client.on('message', async message => {
                         if (team == "h") embed.setThumbnail(teamLogoURLs[hTeam]);
                         if (team == "v") embed.setThumbnail(teamLogoURLs[vTeam]);
 
-                        // description = "";
+                        description = "";
 
-                        // description += "\n```prolog\n";
                         let playerNames = "";
                         let playerStats = "";
 
                         for (var i = 0; i < b.stats.activePlayers.length; i++) {
                             if ((b.stats.activePlayers[i].teamId == vTeamId && team == "v") || (b.stats.activePlayers[i].teamId == hTeamId && team == "h")) {
                                 if (players[b.stats.activePlayers[i].personId].split('').includes("'")) players[b.stats.activePlayers[i].personId] = players[b.stats.activePlayers[i].personId].replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '');
-                                // if (b.stats.activePlayers[i].isOnCourt) description += b.stats.activePlayers[i].pos+" ";
-                                // description += players[b.stats.activePlayers[i].personId].split(' ')[1] + ": " + b.stats.activePlayers[i].points + " pts, " + b.stats.activePlayers[i].totReb + " trb, " + b.stats.activePlayers[i].assists + " ast\n"
+                                if (args[1] == "-m" || args[1] == "mobile") description += players[b.stats.activePlayers[i].personId].split(' ')[1] + ": " + b.stats.activePlayers[i].points + " pts, " + b.stats.activePlayers[i].totReb + " trb, " + b.stats.activePlayers[i].assists + " ast\n"
                                 playerNames += players[b.stats.activePlayers[i].personId] + "\n";
                                 playerStats += b.stats.activePlayers[i].points + " / " + b.stats.activePlayers[i].totReb + " / " + b.stats.activePlayers[i].assists + "\n";
                             }
 
                         }
 
-                        embed.addField("Player", playerNames, true);
-                        embed.addField("Pts/Trb/Ast", playerStats, true);
+                        if (args[1] == "-m" || args[1] == "mobile") {
 
-                        // description += "```";
-
-                        // embed.setDescription(description);
+                            embed.setDescription(description);
+                        } else {
+                            embed.addField("Player", playerNames, true);
+                            embed.addField("Pts/Trb/Ast", playerStats, true);
+                            embed.addField("On Mobile?", "Use `nba boxscore " + args[0] + " -m`");
+                        }
 
                         me.edit(embed);
 
@@ -638,8 +636,8 @@ client.on('message', async message => {
 
                 eDescription += "`";
                 // embed.setDescription(eDescription);
-                embed.addField("Number",playerNumbers, true);
-                embed.addField("Name",playerNamez, true);
+                embed.addField("Number", playerNumbers, true);
+                embed.addField("Name", playerNamez, true);
                 me.edit(embed);
             });
 
@@ -684,8 +682,10 @@ setInterval(() => {
         currentDate = b.links.currentDate;
     });
 
-    Boats.postStats(client.guilds.size, "544017840760422417");
-    dbl.postStats(client.guilds.size);
+    if (clientReady) {
+        Boats.postStats(client.guilds.size, "544017840760422417");
+        dbl.postStats(client.guilds.size);
+    }
 }, 60000);
 
 setInterval(() => {
@@ -696,5 +696,9 @@ setInterval(() => {
         seasonScheduleYear = b.seasonScheduleYear;
     });
 }, 86400000);
+
+setInterval(() => {
+    client.user.setActivity("nba help | nbabot.js.org | "+client.guilds.size+" servers", {type: "PLAYING"});
+}, 60000);
 
 client.login(secrets.token);
