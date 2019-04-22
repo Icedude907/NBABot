@@ -117,10 +117,14 @@ client.once('ready', () => {
         currentDate = b.links.currentDate;
     });
 
-    client.user.setActivity("nba help | nbabot.js.org | "+client.guilds.size+" servers", {type: "PLAYING"});
+    client.user.setActivity("nba help | nbabot.js.org | " + client.guilds.size + " servers", {
+        type: "PLAYING"
+    });
 });
 
 client.on('message', async message => {
+
+    if (message.content == "stop") message.channel.stopTyping();
 
     if (message.content.split(' ')[0].toLowerCase() != "nba" || message.author.bot) return;
 
@@ -144,22 +148,36 @@ client.on('message', async message => {
 
         case 'help':
         case 'commands':
+        case 'cmds':
 
-            embed = new Discord.RichEmbed()
-                .setTitle("Stats on NBABot:")
-                .setAuthor("NBABot", client.user.displayAvatarURL)
-                .setColor(0xff4242)
-                .setFooter("nba [command]")
-                .setTimestamp()
-                .addField("NBA Commands", "`scores player-info player-stats boxscore teams standings roster`")
-                .addField("Other Commands", "`help ping uptime invite vote github bot-stats`")
-                .setDescription("To view detailed usage, visit [nbabot.js.org](https://nbabot.js.org/)")
-            message.channel.send(embed);
-            // sendEmbed = true;
-            // eTitle = "Help";
-            // eDescription = "```prolog\nNormal Commands\n'nba help' 'nba ping' 'nba uptime' 'nba invite' 'nba vote' 'nba github'\nNBA Commands\n'nba scores' - displays the scores for today.\n'nba player-info [player name]' - displays basic information about that player.\n'nba player-stats [player name]' - displays stats on that user (ppg, trb, apg, etc).\n'nba boxscore [team]' - displays the boxscore for that team.\n'nba teams' - displays the teams, more specifically the codes which I use for this bot, nicknames are coming soon.\n'nba standings' - displays the league-wide standings.\n'nba standings west' - displays the standings for the western conference.\n'nba standings east' - displays the standings for the eastern conference.```";
-            // eDescription = "These are the command that you can use:\n```prolog\nNormal Commands\nhelp ping uptime invite vote github\nNBA Commands\nscores player-info player-stats boxscore teams standings```\nTo view detailed usage, visit [nbabot.js.org](https://nbabot.js.org)\nFeel free to vote for this bot so other people hear about it [here](https://discordbots.org/bot/544017840760422417/vote).";
-            // eDescription = "**NBA Commands**:\n`scores player-info player-stats boxscore teams standings`\n\n**Other Commands**:\n`help ping uptime invite vote github bot-stats`\n_To view detailed usage, visit [nbabot.js.org](https://nbabot.js.org/)._";
+            if (!args[0]) {
+                embed = new Discord.RichEmbed()
+                    .setTitle("Help for NBABot:")
+                    .setColor(0xff4242)
+                    .setFooter("nba [command]")
+                    .setTimestamp()
+                    .addField("NBA Commands", "`nba scores`\n`nba player-info [player]`\n`nba player-stats [player]`\n`nba boxscore [team]`\n`nba teams`\n`nba standings`\n`nba standings [east/west]`\n`nba roster [team]`")
+                    .addField("Other Commands", "`nba help`\n`nba ping`\n`nba uptime`\n`nba invite`\n`nba vote`\n`nba github`\n`nba bot-stats`")
+                    .setDescription("To view detailed usage, visit [nbabot.js.org](https://nbabot.js.org/) or use `nba help detailed`.")
+                message.channel.send(embed);
+            } else if (args[0]) {
+                message.channel.send("Sent you a DM containing help information.");
+                embed = new Discord.RichEmbed()
+                    .setTitle("Help for NBABot:")
+                    .setColor(0xff4242)
+                    .setFooter("nba [command]")
+                    .setTimestamp()
+                    // .addField("NBA Commands", "`nba scores`\nShows you the live scores for today.\n`nba player-info [player]`\nShows you basic stats on the players on that team in the game today. E.g. nba boxscore PHX\n`nba player-stats [player]`\nShows you stats on that player. E.g. nba player-stats LeBron James\n`nba boxscore [team]`\nShows you basic information on that player like height, weight and draft pick. E.g. nba player-info LeBron James\n`nba teams`\nShows you the teams for the current season.\n`nba standings`\nShows you the current league standings.\n`nba standings [east/west]`\nShows you the current east/west standings.\n`nba roster [team]`\nShows you the current roster for that team. E.g. nba roster PHX")
+                    .addField("nba scores","Shows you the live scores for today.")
+                    .addField("nba boxscore [team]","Shows you basic stats on the players on that team in the game today. E.g. nba boxscore PHX.")
+                    .addField("nba player-stats [player]","Shows you stats on that player. E.g. nba player-stats LeBron James")
+                    .addField("nba player-info [player]","Shows you basic information on that player like height, weight and draft pick. E.g. nba player-info LeBron James")
+                    .addField("nba standings","Shows you the current league standings.")
+                    .addField("nba standings west/east","Shows you the current west/east standings.")
+                    .addField("nba roster [team]","Shows you the current roster for that team. E.g. nba roster PHX")
+                    .addField("Other Commands", "`nba help`\n`nba ping`\n`nba uptime`\n`nba invite`\n`nba vote`\n`nba github`\n`nba bot-stats`")
+                message.author.send(embed);
+            }
             break;
 
         case 'ping':
@@ -185,6 +203,10 @@ client.on('message', async message => {
             eDescription = "NBABot is and will be completely free. To support this bot, add it to your discord servers and make sure to vote for my bot as much as possible so it gains popularity and more people discover this bot.\nhttps://discordbots.org/bot/544017840760422417/vote";
             break;
 
+        case 'website':
+            message.channel.send("**https://nbabot.js.org/**");
+            break;
+
         case 'github':
             message.channel.send("**https://github.com/EliotChignell/NBABot**");
             break;
@@ -192,7 +214,7 @@ client.on('message', async message => {
         case 'bot-stats':
             embed = new Discord.RichEmbed()
                 .setTitle("Stats on NBABot:")
-                .setAuthor("NBABot", client.user.displayAvatarURL)
+
                 .setColor(0xff4242)
                 .setFooter("nba [command]")
                 .setTimestamp()
@@ -215,12 +237,15 @@ client.on('message', async message => {
             break;
 
         case 'scores':
-
-            me = await message.channel.send('Loading scores...');
-
+        case 'today':
+        case 'games':
+        case 'scoreboard':
+        case 'score':
+	    case 's':            
+	    case 'live':
             embed = new Discord.RichEmbed()
                 .setTitle("Scores for today:")
-                .setAuthor("NBABot", client.user.displayAvatarURL)
+
                 .setColor(0xff4242)
                 .setFooter("nba [command]")
                 .setTimestamp();
@@ -261,7 +286,8 @@ client.on('message', async message => {
                     // if (str != "" && str2 != "") embed.addField(str, str2);
 
                 }
-                me.edit(embed);
+                message.channel.send(embed);
+                message.channel.stopTyping();
             });
 
             break;
@@ -269,7 +295,7 @@ client.on('message', async message => {
         case 'player-info':
             if (!args[0] || !args[1] || args[0].split('').includes("[") || args[1].split('').includes("]")) return message.channel.send("Please specifiy a player, e.g. `nba player-info lebron james`");
             playerFound = false;
-            me = await message.channel.send("Loading...");
+            
 
             request({
                 uri: 'http://data.nba.net/10s/prod/v1/' + seasonScheduleYear + '/players.json',
@@ -282,26 +308,27 @@ client.on('message', async message => {
                         if (draftStr == "# ()") draftStr = "Undrafted";
                         let embed = new Discord.RichEmbed()
                             .setTitle("Basic Information on the player `" + b.league.standard[i].firstName + " " + b.league.standard[i].lastName + "`:")
-                            .setAuthor("NBABot", client.user.displayAvatarURL)
+
                             .setColor(0xff4242)
                             // .setDescription("Jersey Number: `" + b.league.standard[i].jersey + "`\nPosition: `" + b.league.standard[i].pos + "`\nHeight: `" + b.league.standard[i].heightFeet + "'" + b.league.standard[i].heightInches + '" (' + b.league.standard[i].heightMeters + "m)`\nWeight: `" + b.league.standard[i].weightKilograms + "kg`\nDate of Birth: `" + b.league.standard[i].dateOfBirthUTC + "`\nDrafted: " + draftStr + "\n\n_Type `nba player-stats " + args[0] + " " + args[1] + "` to view stats on that player._")
                             .setFooter("nba [command]")
                             .setTimestamp()
                             .addField("Jersey Number", b.league.standard[i].jersey, true)
                             .addField("Position", b.league.standard[i].pos, true)
-                            .addField("Height", b.league.standard[i].heightFeet + "'" + b.league.standard[i].heightInches + '" (' + b.league.standard[i].heightMeters + "m", true)
+                            .addField("Height", b.league.standard[i].heightFeet + "'" + b.league.standard[i].heightInches + '" (' + b.league.standard[i].heightMeters + "m)", true)
                             .addField("Weight", b.league.standard[i].weightKilograms, true)
                             .addField("Date of Birth", b.league.standard[i].dateOfBirthUTC, true)
                             .addField("Drafted", draftStr, true)
                             .addField("...", "Type `nba player-stats " + args.join(' ') + "` to view stats on that player.");
 
-                        return me.edit(embed);
+                        message.channel.send(embed);
+                        message.channel.stopTyping();
 
                         break;
                     }
                 }
             }).then(() => {
-                if (!playerFound) me.edit("Player not found.");
+                if (!playerFound) message.channel.send("Player not found.");
             });
 
             break;
@@ -309,7 +336,7 @@ client.on('message', async message => {
         case 'player-stats':
             if (!args[0] || !args[1] || args[0].split('').includes("[") || args[1].split('').includes(']')) return message.channel.send("Please specifiy a player, e.g. `nba player-stats lebron james`");
             playerFound = false;
-            me = await message.channel.send("Loading...");
+            
             request({
                 uri: 'http://data.nba.net/10s/prod/v1/' + seasonScheduleYear + '/players.json',
                 json: true
@@ -328,7 +355,7 @@ client.on('message', async message => {
 
                             let embed = new Discord.RichEmbed()
                                 .setTitle("Stats on the player `" + playerName + "`:")
-                                .setAuthor("NBABot", client.user.displayAvatarURL)
+
                                 .setColor(0xff4242)
                                 // .setDescription("PPG: `" + player.ppg + "`\nAPG: `" + player.apg + "`\nRPG: `" + player.rpg + "`\nMPG: `" + player.mpg + "`\nTOPG: `" + player.topg + "`\nSPG: `" + player.spg + "`\nFT%: `" + player.ftp + "%`\nFG%: `" + player.fgp + "%`\n+/-: `" + player.plusMinus + "`\n\n_Type `nba player-info " + args[0] + " " + args[1] + "` to view info on that player._")
                                 .addField("PPG", player.ppg, true)
@@ -343,12 +370,13 @@ client.on('message', async message => {
                                 .addField("...", "Type `nba player-info " + args.join(" ") + "` to view basic information on that player.")
                                 .setFooter("nba [command]")
                                 .setTimestamp();
-                            return me.edit(embed);
+                            message.channel.send(embed);
+                            message.channel.stopTyping();
                         });
                     }
                 }
             }).then(() => {
-                if (!playerFound) me.edit("Player not found.");
+                if (!playerFound) message.channel.send("Player not found.");
             });
 
             break;
@@ -386,7 +414,8 @@ client.on('message', async message => {
 
                     embed.addField("Enter this to predict today's games:","`nba predict "+availableTeams.join(' ')+"`");
 
-                    me.edit(embed);
+                    message.channel.send(embed);
+message.channel.stopTyping();
                 });
                 
                 break;
@@ -396,10 +425,11 @@ client.on('message', async message => {
             */
 
         case 'boxscore':
+	    case 'box':
+        case 'b':
+            
 
-            me = await message.channel.send("Loading...");
-
-            if (!args[0]) return me.edit("Please specify a team. E.g. `nba boxscore PHX`.");
+            if (!args[0]) return message.channel.send("Please specify a team. E.g. `nba boxscore PHX`.");
 
             let gameFound = false;
 
@@ -416,12 +446,12 @@ client.on('message', async message => {
 
                     if (args[0].toLowerCase() == b.games[i].hTeam.triCode.toLowerCase()) {
                         gameFound = true;
-                        if (b.games[i].statusNum == 1) return me.edit("That game has not started yet.");
+                        if (b.games[i].statusNum == 1) return message.channel.send("That game has not started yet.");
                         team = "h";
                         otherTeam = "v";
                     } else if (args[0].toLowerCase() == b.games[i].vTeam.triCode.toLowerCase()) {
                         gameFound = true;
-                        if (b.games[i].statusNum == 1) return me.edit("That game has not started yet.");
+                        if (b.games[i].statusNum == 1) return message.channel.send("That game has not started yet.");
                         team = "v";
                         otherTeam = "h";
                     } else {
@@ -443,7 +473,7 @@ client.on('message', async message => {
 
                         embed = new Discord.RichEmbed()
                             .setTitle(vTeam + " " + b.basicGameData.vTeam.score + " - " + b.basicGameData.hTeam.score + " " + hTeam + "\nGame Played on `" + gameStartedAt + "`")
-                            .setAuthor("NBABot", client.user.displayAvatarURL)
+
                             .setColor(0xff4242)
                             .setFooter("nba [command]")
                             .setTimestamp();
@@ -467,7 +497,6 @@ client.on('message', async message => {
                         }
 
                         if (args[1] == "-m" || args[1] == "mobile") {
-
                             embed.setDescription(description);
                         } else {
                             embed.addField("Player", playerNames, true);
@@ -475,13 +504,15 @@ client.on('message', async message => {
                             embed.addField("On Mobile?", "Use `nba boxscore " + args[0] + " -m`");
                         }
 
-                        me.edit(embed);
+                        message.channel.send(embed);
+                        message.channel.stopTyping();
 
                     });
 
                 }
             }).then(() => {
-                if (!gameFound) return me.edit("That team aren't playing today or that team doesn't exist.");
+                message.channel.stopTyping();
+                if (!gameFound) message.channel.send("That team aren't playing today or that team doesn't exist.");
             });
 
             break;
@@ -489,11 +520,11 @@ client.on('message', async message => {
 
         case 'teams':
 
-            me = await message.channel.send("Loading...");
+            
 
             embed = new Discord.RichEmbed()
                 .setTitle("Teams for the " + seasonScheduleYear + "/" + (parseInt(seasonScheduleYear) + 1) + " season:")
-                .setAuthor("NBABot", client.user.displayAvatarURL)
+
                 .setColor(0xff4242)
                 .setFooter("nba [command]")
                 .setTimestamp();
@@ -503,13 +534,14 @@ client.on('message', async message => {
                 cDescription += "`" + teams[key].tricode + "` ";
             }
             embed.setDescription(cDescription);
-            me.edit(embed);
+            message.channel.send(embed);
+            message.channel.stopTyping();
 
             break;
 
         case 'standings':
 
-            me = await message.channel.send("Loading...");
+            
 
             if (!args[0]) {
                 // League Standings
@@ -519,7 +551,7 @@ client.on('message', async message => {
                 }, (e, r, b) => {
                     embed = new Discord.RichEmbed()
                         .setTitle("League Standings:")
-                        .setAuthor("NBABot", client.user.displayAvatarURL)
+
                         .setColor(0xff4242)
                         .setFooter("nba [command]")
                         .setTimestamp();
@@ -538,7 +570,8 @@ client.on('message', async message => {
                     sDescription += "`\nYou can use `nba standings west` or `nba standings east` too.";
 
                     embed.setDescription(sDescription);
-                    me.edit(embed);
+                    message.channel.send(embed);
+                    message.channel.stopTyping();
                 });
             } else if (args[0].toLowerCase() == "west" || args[0].toLowerCase() == "w") {
                 // West Standings
@@ -548,7 +581,7 @@ client.on('message', async message => {
                 }, (e, r, b) => {
                     embed = new Discord.RichEmbed()
                         .setTitle("West Standings:")
-                        .setAuthor("NBABot", client.user.displayAvatarURL)
+
                         .setColor(0xff4242)
                         .setFooter("nba [command]")
                         .setTimestamp();
@@ -567,7 +600,8 @@ client.on('message', async message => {
                     sDescription += "`";
 
                     embed.setDescription(sDescription);
-                    me.edit(embed);
+                    message.channel.send(embed);
+                    message.channel.stopTyping();
 
                 });
             } else if (args[0].toLowerCase() == "east" || args[0].toLowerCase() == "e") {
@@ -578,7 +612,7 @@ client.on('message', async message => {
                 }, (e, r, b) => {
                     embed = new Discord.RichEmbed()
                         .setTitle("East Standings:")
-                        .setAuthor("NBABot", client.user.displayAvatarURL)
+
                         .setColor(0xff4242)
                         .setFooter("nba [command]")
                         .setTimestamp();
@@ -597,20 +631,21 @@ client.on('message', async message => {
                     sDescription += "`";
 
                     embed.setDescription(sDescription);
-                    me.edit(embed);
+                    message.channel.send(embed);
+                    message.channel.stopTyping();
 
                 });
             } else {
                 // Invalid
-                me.edit("Please use the command correctly. E.g. `nba standings west` or `nba standings east` or `nba standings` (full league standings).");
+                message.channel.send("Please use the command correctly. E.g. `nba standings west` or `nba standings east` or `nba standings` (full league standings).");
             }
             break;
 
         case 'roster':
 
-            me = await message.channel.send("Loading...");
+            
 
-            if (!args[0] || !swap(teams)[args[0].toUpperCase()]) return me.edit("Please specify a team. E.g. `nba roster PHX`.");
+            if (!args[0] || !swap(teams)[args[0].toUpperCase()]) return message.channel.send("Please specify a team. E.g. `nba roster PHX`.");
 
             let teamIdd = swap(teams)[args[0].toUpperCase()];
 
@@ -620,7 +655,7 @@ client.on('message', async message => {
             }, (e, r, b) => {
                 embed = new Discord.RichEmbed()
                     .setTitle("Roster for the " + (seasonScheduleYear + "-" + (parseInt(seasonScheduleYear) + 1)) + " team of " + args[0].toUpperCase() + ":")
-                    .setAuthor("NBABot", client.user.displayAvatarURL)
+
                     .setColor(0xff4242)
                     .setFooter("nba [command]")
                     .setThumbnail(teamLogoURLs[teams[teamIdd].tricode])
@@ -638,11 +673,16 @@ client.on('message', async message => {
                 // embed.setDescription(eDescription);
                 embed.addField("Number", playerNumbers, true);
                 embed.addField("Name", playerNamez, true);
-                me.edit(embed);
+                message.channel.send(embed);
+                message.channel.stopTyping();
             });
 
             break;
-
+	case 'bracket':
+	    sendEmbed = true;
+	    eImage = "https://ak-static.cms.nba.com/wp-content/uploads/sites/45/2019/04/PlayoffsBracket_042019-1200x560.jpg";
+	    // message.channel.send("https://sportshub-cbsistatic-com.cdn.ampproject.org/ii/w820/s/sportshub.cbsistatic.com/i/r/2019/04/11/b9f7490e-abd5-4923-b050-ffdb9889c73d/resize/750x422/3d11f2c6f6154f5d8db5c393191abf5d/nbaplayoffbracket-041019.jpg");
+	    break;
 
 
     }
@@ -650,7 +690,7 @@ client.on('message', async message => {
     if (sendEmbed) {
         let embed = new Discord.RichEmbed()
             .setTitle(eTitle)
-            .setAuthor("NBABot", client.user.displayAvatarURL)
+
             .setColor(0xff4242)
             .setDescription(eDescription)
             .setFooter("nba [command]")
@@ -666,7 +706,7 @@ client.on('error', console.error);
 client.on("guildCreate", g => {
     console.log("[JOINED] " + g.name + ", " + g.members.size + " members.");
     client.users.get("401649168948396032").send("[JOINED] " + g.name + ", " + g.members.size + " members.");
-    g.channels.find(c => c.name == "general").send("**Thank you for adding me to your server! Check out https://nbabot.js.org for the available commands.**");
+    if (g.channels.find(c => c.name == "general")) g.channels.find(c => c.name == "general").send("**Thank you for adding me to your server! Check out https://nbabot.js.org for the available commands.**");
 });
 
 client.on("guildDelete", g => {
@@ -698,7 +738,9 @@ setInterval(() => {
 }, 86400000);
 
 setInterval(() => {
-    client.user.setActivity("nba help | nbabot.js.org | "+client.guilds.size+" servers", {type: "PLAYING"});
+    client.user.setActivity("nba help | nbabot.js.org | " + client.guilds.size + " servers", {
+        type: "PLAYING"
+    });
 }, 60000);
 
 client.login(secrets.token);
