@@ -517,7 +517,7 @@ client.on('message', async message => {
 
                 }
             }).then(() => {
-                if (!gameFound) me.edit("That team aren't playing today or that team doesn't exist.");
+                if (!gameFound) me.edit("That team aren't playing today or that team doesn't exist. For example, `nba boxscore PHX`.");
             });
 
             break;
