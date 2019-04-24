@@ -2,6 +2,7 @@
 const Discord = require('discord.js');
 const request = require('request-promise');
 const Enmap = require('enmap');
+const AsciiTable = require("ascii-table");
 const DiscordBotList = require('dblapi.js');
 const BOATS = require("boats.js");
 
@@ -19,9 +20,7 @@ const dbl = new DiscordBotList(secrets.dbl);
 const prefix = "nba ";
 
 // Enmaps
-const botStats = new Enmap({
-    name: "botStats"
-});
+const bets = new Enmap({name: "bets"});
 
 let clientReady = false;
 
@@ -128,6 +127,14 @@ client.on('message', async message => {
 
     if (message.content.split(' ')[0].toLowerCase() != "nba" || message.author.bot) return;
 
+    if (!bets.get(message.author.id)) {
+        bets.set(message.author.id, {
+            id: message.author.id,
+            correct: 0,
+            wrong: 0,
+        });
+    }
+
     // Logging user messages
     console.log(message.guild.name + ' (' + message.author.tag + ') ' + message.content);
 
@@ -157,7 +164,7 @@ client.on('message', async message => {
                     .setFooter("nba [command]")
                     .setTimestamp()
                     .addField("NBA Commands", "`nba scores`\n`nba player-info [player]`\n`nba player-stats [player]`\n`nba boxscore [team]`\n`nba teams`\n`nba standings`\n`nba standings [east/west]`\n`nba roster [team]`")
-                    .addField("Other Commands", "`nba help`\n`nba ping`\n`nba uptime`\n`nba invite`\n`nba vote`\n`nba github`\n`nba bot-stats`")
+                    .addField("Other Commands", "`nba help` `nba ping` `nba uptime` `nba invite` `nba vote` `nba github` `nba bot-stats`")
                     .setDescription("To view detailed usage, visit [nbabot.js.org](https://nbabot.js.org/) or use `nba help detailed`.")
                 message.channel.send(embed);
             } else if (args[0]) {
@@ -168,14 +175,14 @@ client.on('message', async message => {
                     .setFooter("nba [command]")
                     .setTimestamp()
                     // .addField("NBA Commands", "`nba scores`\nShows you the live scores for today.\n`nba player-info [player]`\nShows you basic stats on the players on that team in the game today. E.g. nba boxscore PHX\n`nba player-stats [player]`\nShows you stats on that player. E.g. nba player-stats LeBron James\n`nba boxscore [team]`\nShows you basic information on that player like height, weight and draft pick. E.g. nba player-info LeBron James\n`nba teams`\nShows you the teams for the current season.\n`nba standings`\nShows you the current league standings.\n`nba standings [east/west]`\nShows you the current east/west standings.\n`nba roster [team]`\nShows you the current roster for that team. E.g. nba roster PHX")
-                    .addField("nba scores","Shows you the live scores for today.")
-                    .addField("nba boxscore [team]","Shows you basic stats on the players on that team in the game today. E.g. nba boxscore PHX.")
-                    .addField("nba player-stats [player]","Shows you stats on that player. E.g. nba player-stats LeBron James")
-                    .addField("nba player-info [player]","Shows you basic information on that player like height, weight and draft pick. E.g. nba player-info LeBron James")
-                    .addField("nba standings","Shows you the current league standings.")
-                    .addField("nba standings west/east","Shows you the current west/east standings.")
-                    .addField("nba roster [team]","Shows you the current roster for that team. E.g. nba roster PHX")
-                    .addField("Other Commands", "`nba help`\n`nba ping`\n`nba uptime`\n`nba invite`\n`nba vote`\n`nba github`\n`nba bot-stats`")
+                    .addField("nba scores", "Shows you the live scores for today.")
+                    .addField("nba boxscore [team]", "Shows you basic stats on the players on that team in the game today. E.g. nba boxscore PHX.")
+                    .addField("nba player-stats [player]", "Shows you stats on that player. E.g. nba player-stats LeBron James")
+                    .addField("nba player-info [player]", "Shows you basic information on that player like height, weight and draft pick. E.g. nba player-info LeBron James")
+                    .addField("nba standings", "Shows you the current league standings.")
+                    .addField("nba standings west/east", "Shows you the current west/east standings.")
+                    .addField("nba roster [team]", "Shows you the current roster for that team. E.g. nba roster PHX")
+                    .addField("Other Commands", "`nba help` `nba ping` `nba uptime` `nba invite` `nba vote` `nba github` `nba bot-stats`")
                 message.author.send(embed);
             }
             break;
@@ -241,11 +248,13 @@ client.on('message', async message => {
         case 'games':
         case 'scoreboard':
         case 'score':
-	    case 's':            
-	    case 'live':
+        case 's':
+        case 'live':
+
+            me = await message.channel.send("Loading...");
+
             embed = new Discord.RichEmbed()
                 .setTitle("Scores for today:")
-
                 .setColor(0xff4242)
                 .setFooter("nba [command]")
                 .setTimestamp();
@@ -286,16 +295,18 @@ client.on('message', async message => {
                     // if (str != "" && str2 != "") embed.addField(str, str2);
 
                 }
-                message.channel.send(embed);
-                message.channel.stopTyping();
+                me.edit(embed);
             });
 
             break;
 
         case 'player-info':
-            if (!args[0] || !args[1] || args[0].split('').includes("[") || args[1].split('').includes("]")) return message.channel.send("Please specifiy a player, e.g. `nba player-info lebron james`");
+
+            me = await message.channel.send("Loading...");
+
+            if (!args[0] || !args[1] || args[0].split('').includes("[") || args[1].split('').includes("]")) return me.edit("Please specifiy a player, e.g. `nba player-info lebron james`");
             playerFound = false;
-            
+
 
             request({
                 uri: 'http://data.nba.net/10s/prod/v1/' + seasonScheduleYear + '/players.json',
@@ -316,19 +327,18 @@ client.on('message', async message => {
                             .addField("Jersey Number", b.league.standard[i].jersey, true)
                             .addField("Position", b.league.standard[i].pos, true)
                             .addField("Height", b.league.standard[i].heightFeet + "'" + b.league.standard[i].heightInches + '" (' + b.league.standard[i].heightMeters + "m)", true)
-                            .addField("Weight", b.league.standard[i].weightKilograms, true)
+                            .addField("Weight", b.league.standard[i].weightKilograms + "kg", true)
                             .addField("Date of Birth", b.league.standard[i].dateOfBirthUTC, true)
                             .addField("Drafted", draftStr, true)
                             .addField("...", "Type `nba player-stats " + args.join(' ') + "` to view stats on that player.");
 
-                        message.channel.send(embed);
-                        message.channel.stopTyping();
+                        me.edit(embed);
 
                         break;
                     }
                 }
             }).then(() => {
-                if (!playerFound) message.channel.send("Player not found.");
+                if (!playerFound) me.edit(":x: Error: Player not found.");
             });
 
             break;
@@ -336,7 +346,9 @@ client.on('message', async message => {
         case 'player-stats':
             if (!args[0] || !args[1] || args[0].split('').includes("[") || args[1].split('').includes(']')) return message.channel.send("Please specifiy a player, e.g. `nba player-stats lebron james`");
             playerFound = false;
-            
+
+            me = await message.channel.send("Loading...");
+
             request({
                 uri: 'http://data.nba.net/10s/prod/v1/' + seasonScheduleYear + '/players.json',
                 json: true
@@ -351,11 +363,35 @@ client.on('message', async message => {
                             uri: 'http://data.nba.net/10s/prod/v1/' + seasonScheduleYear + '/players/' + b.league.standard[i].personId + '_profile.json',
                             json: true
                         }, (e, r, b) => {
-                            let player = b.league.standard.stats.latest;
+
+                            // Determing what type of season the user is requesting
+
+                            // console.log(b.league.standard.stats.latest.ppg+" "+b.league.standard.stats.latest.seasonStageId);
+
+                            let season, player;
+                            if (args[2]) {
+                                if (args[2].toLowerCase() == "-c") {
+                                    player = b.league.standard.stats.careerSummary;
+                                    season = "Career";
+                                } else if (args[2].toLowerCase() == "-r") {
+                                    player = b.league.standard.stats.regularSeason.season[0].total;
+                                    season = b.league.standard.stats.latest.seasonYear + "-" + (parseInt(b.league.standard.stats.latest.seasonYear) + 1) + " Regular season";
+                                }
+                            } else if (b.league.standard.stats.latest.ppg == "-1") { // This means it's the playoffs and that player isn't in the playoffs.
+                                player = b.league.standard.stats.regularSeason.season[0].total;
+                                season = b.league.standard.stats.latest.seasonYear + "-" + (parseInt(b.league.standard.stats.latest.seasonYear) + 1) + " Regular season";
+                            } else if (b.league.standard.stats.latest.ppg != "-1" && b.league.standard.stats.latest.seasonStageId == 4) {
+                                player = b.league.standard.stats.latest;
+                                season = b.league.standard.stats.latest.seasonYear + "-" + (parseInt(b.league.standard.stats.latest.seasonYear) + 1) + " Playoff";
+                            } else {
+                                player = b.league.standard.stats.latest;
+                                season = "";
+                            }
+
+                            // console.log(player);
 
                             let embed = new Discord.RichEmbed()
-                                .setTitle("Stats on the player `" + playerName + "`:")
-
+                                .setTitle(season + " stats on the player `" + playerName + "`:")
                                 .setColor(0xff4242)
                                 // .setDescription("PPG: `" + player.ppg + "`\nAPG: `" + player.apg + "`\nRPG: `" + player.rpg + "`\nMPG: `" + player.mpg + "`\nTOPG: `" + player.topg + "`\nSPG: `" + player.spg + "`\nFT%: `" + player.ftp + "%`\nFG%: `" + player.fgp + "%`\n+/-: `" + player.plusMinus + "`\n\n_Type `nba player-info " + args[0] + " " + args[1] + "` to view info on that player._")
                                 .addField("PPG", player.ppg, true)
@@ -364,74 +400,32 @@ client.on('message', async message => {
                                 .addField("MPG", player.mpg, true)
                                 .addField("TOPG", player.topg, true)
                                 .addField("SPG", player.spg, true)
-                                .addField("FT%", player.ftp, true)
-                                .addField("FG%", player.fgp, true)
+                                .addField("FT%", player.ftp + " (" + player.ftm + "/" + player.fta + ")", true)
+                                .addField("FG%", player.fgp + " (" + player.fgm + "/" + player.fga + ")", true)
+                                .addField("3P%", player.tpp + " (" + player.tpm + "/" + player.tpa + ")", true)
                                 .addField("Total +/-", player.plusMinus, true)
-                                .addField("...", "Type `nba player-info " + args.join(" ") + "` to view basic information on that player.")
+                                .addField("Useful Tips", "Type `nba player-info " + args[0] + " " + args[1] + "` to view basic information on that player.\nType `nba player-stats " + args[0] + " " + args[1] + " -c` to view career stats on that player.\nType `nba player-stats " + args[0] + " " + args[1] + " -r` to view the latest regular season stats on that player if it defaults to playoff stats.")
                                 .setFooter("nba [command]")
                                 .setTimestamp();
-                            message.channel.send(embed);
-                            message.channel.stopTyping();
+                            me.edit(embed);
                         });
                     }
                 }
             }).then(() => {
-                if (!playerFound) message.channel.send("Player not found.");
+                if (!playerFound) me.edit(":x: Error: Player not found.");
             });
 
             break;
 
-            /*
-            case 'predictions':
-
-                me = await message.channel.send("Loading games...");
-
-                embed = new Discord.RichEmbed()
-                            .setTitle("Available games to predict:")
-                            .setAuthor("NBABot",client.user.displayAvatarURL)
-                            .setColor(0xff4242)
-                            .setFooter("nba [command]")
-                            .setTimestamp();
-                
-                request({
-                    uri: "https://api.myjson.com/bins/k7xwk",
-                    json: true
-                }, (e,r,b) => {
-
-                    let availableTeams = [];
-
-                    for (var i=0;i<b.games.length;i++) {
-                        let game = b.games[i];
-
-                        if (game.statusNum == 1) {
-                            embed.addField(game.vTeam.triCode+" @ "+game.hTeam.triCode,"Game starts in "+msToTime(new Date(game.startTimeUTC).getTime() - new Date().getTime())+".");
-                            availableTeams.push(game.vTeam.triCode+"/"+game.hTeam.triCode);
-                        }
-
-                    }
-
-                    if (availableTeams.length == 0) return me.edit("There are no games left to predict today.");
-
-                    embed.addField("Enter this to predict today's games:","`nba predict "+availableTeams.join(' ')+"`");
-
-                    message.channel.send(embed);
-message.channel.stopTyping();
-                });
-                
-                break;
-
-            case 'predict':
-                break;
-            */
-
         case 'boxscore':
-	    case 'box':
+        case 'box':
         case 'b':
-            
 
             if (!args[0]) return message.channel.send("Please specify a team. E.g. `nba boxscore PHX`.");
 
             let gameFound = false;
+
+            me = await message.channel.send("Loading...");
 
             request({
                 uri: "http://data.nba.net/10s/prod/v1/" + currentDate + "/scoreboard.json",
@@ -446,12 +440,12 @@ message.channel.stopTyping();
 
                     if (args[0].toLowerCase() == b.games[i].hTeam.triCode.toLowerCase()) {
                         gameFound = true;
-                        if (b.games[i].statusNum == 1) return message.channel.send("That game has not started yet.");
+                        if (b.games[i].statusNum == 1) return me.edit("That game has not started yet.");
                         team = "h";
                         otherTeam = "v";
                     } else if (args[0].toLowerCase() == b.games[i].vTeam.triCode.toLowerCase()) {
                         gameFound = true;
-                        if (b.games[i].statusNum == 1) return message.channel.send("That game has not started yet.");
+                        if (b.games[i].statusNum == 1) return me.edit("That game has not started yet.");
                         team = "v";
                         otherTeam = "h";
                     } else {
@@ -473,7 +467,6 @@ message.channel.stopTyping();
 
                         embed = new Discord.RichEmbed()
                             .setTitle(vTeam + " " + b.basicGameData.vTeam.score + " - " + b.basicGameData.hTeam.score + " " + hTeam + "\nGame Played on `" + gameStartedAt + "`")
-
                             .setColor(0xff4242)
                             .setFooter("nba [command]")
                             .setTimestamp();
@@ -486,42 +479,51 @@ message.channel.stopTyping();
                         let playerNames = "";
                         let playerStats = "";
 
+                        let table = new AsciiTable();
+                        table
+                            .setHeading('Name', 'MINS', 'PTS', 'FG%', '3P%', 'REB', 'AST', 'STL', 'BLK');
+                        // .removeBorder();
+
                         for (var i = 0; i < b.stats.activePlayers.length; i++) {
                             if ((b.stats.activePlayers[i].teamId == vTeamId && team == "v") || (b.stats.activePlayers[i].teamId == hTeamId && team == "h")) {
-                                if (players[b.stats.activePlayers[i].personId].split('').includes("'")) players[b.stats.activePlayers[i].personId] = players[b.stats.activePlayers[i].personId].replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '');
-                                if (args[1] == "-m" || args[1] == "mobile") description += players[b.stats.activePlayers[i].personId].split(' ')[1] + ": " + b.stats.activePlayers[i].points + " pts, " + b.stats.activePlayers[i].totReb + " trb, " + b.stats.activePlayers[i].assists + " ast\n"
-                                playerNames += players[b.stats.activePlayers[i].personId] + "\n";
-                                playerStats += b.stats.activePlayers[i].points + " / " + b.stats.activePlayers[i].totReb + " / " + b.stats.activePlayers[i].assists + "\n";
-                            }
 
+                                /*
+                                if (players[b.stats.activePlayers[i].personId].split('').includes("'")) players[b.stats.activePlayers[i].personId] = players[b.stats.activePlayers[i].personId].replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '');
+                                */
+                                if (args[1] == "-m" || args[1] == "mobile") description += players[b.stats.activePlayers[i].personId].split(' ')[1] + ": " + b.stats.activePlayers[i].points + " pts, " + b.stats.activePlayers[i].totReb + " trb, " + b.stats.activePlayers[i].assists + " ast\n";
+                                /*
+                                playerNames += players[b.stats.activePlayers[i].personId].split(' ')[1] + "\n";
+                                playerStats += b.stats.activePlayers[i].min + " " +  b.stats.activePlayers[i].points + " " + b.stats.activePlayers[i].fgp + " " + b.stats.activePlayers[i].ttp + " " + b.stats.activePlayers[i].totReb + " " + b.stats.activePlayers[i].assists + b.stats.activePlayers[i].turnovers + " " + b.stats.activePlayers[i].steals +  " " + b.stats.activePlayers[i].blocks + " " + b.stats.activePlayers[i].plusMinus + "\n";
+                                */
+
+                                table.addRow(players[b.stats.activePlayers[i].personId].split(' ')[1], b.stats.activePlayers[i].min, b.stats.activePlayers[i].points, b.stats.activePlayers[i].fgp, b.stats.activePlayers[i].tpp, b.stats.activePlayers[i].totReb, b.stats.activePlayers[i].assists, b.stats.activePlayers[i].steals, b.stats.activePlayers[i].blocks);
+
+                            }
                         }
 
                         if (args[1] == "-m" || args[1] == "mobile") {
                             embed.setDescription(description);
+                            me.edit(embed);
                         } else {
+                            /*
                             embed.addField("Player", playerNames, true);
-                            embed.addField("Pts/Trb/Ast", playerStats, true);
+                            embed.addField("Mins Pts FG% 3P% Reb Ast Tov Stl Blk Pf +/-", playerStats, true);
                             embed.addField("On Mobile?", "Use `nba boxscore " + args[0] + " -m`");
+                            */
+                            me.edit("```ml\n" + table.toString() + "```");
                         }
-
-                        message.channel.send(embed);
-                        message.channel.stopTyping();
 
                     });
 
                 }
             }).then(() => {
-                message.channel.stopTyping();
-                if (!gameFound) message.channel.send("That team aren't playing today or that team doesn't exist.");
+                if (!gameFound) me.edit("That team aren't playing today or that team doesn't exist.");
             });
 
             break;
 
 
         case 'teams':
-
-            
-
             embed = new Discord.RichEmbed()
                 .setTitle("Teams for the " + seasonScheduleYear + "/" + (parseInt(seasonScheduleYear) + 1) + " season:")
 
@@ -535,13 +537,11 @@ message.channel.stopTyping();
             }
             embed.setDescription(cDescription);
             message.channel.send(embed);
-            message.channel.stopTyping();
-
             break;
 
         case 'standings':
 
-            
+            me = await message.channel.send("Loading...");
 
             if (!args[0]) {
                 // League Standings
@@ -570,8 +570,7 @@ message.channel.stopTyping();
                     sDescription += "`\nYou can use `nba standings west` or `nba standings east` too.";
 
                     embed.setDescription(sDescription);
-                    message.channel.send(embed);
-                    message.channel.stopTyping();
+                    me.edit(embed);
                 });
             } else if (args[0].toLowerCase() == "west" || args[0].toLowerCase() == "w") {
                 // West Standings
@@ -600,8 +599,7 @@ message.channel.stopTyping();
                     sDescription += "`";
 
                     embed.setDescription(sDescription);
-                    message.channel.send(embed);
-                    message.channel.stopTyping();
+                    me.edit(embed);
 
                 });
             } else if (args[0].toLowerCase() == "east" || args[0].toLowerCase() == "e") {
@@ -631,21 +629,20 @@ message.channel.stopTyping();
                     sDescription += "`";
 
                     embed.setDescription(sDescription);
-                    message.channel.send(embed);
-                    message.channel.stopTyping();
+                    me.edit(embed);
 
                 });
             } else {
                 // Invalid
-                message.channel.send("Please use the command correctly. E.g. `nba standings west` or `nba standings east` or `nba standings` (full league standings).");
+                me.edit("Please use the command correctly. E.g. `nba standings west` or `nba standings east` or `nba standings` (full league standings).");
             }
             break;
 
         case 'roster':
 
-            
+            me = await message.channel.send("Loading...");
 
-            if (!args[0] || !swap(teams)[args[0].toUpperCase()]) return message.channel.send("Please specify a team. E.g. `nba roster PHX`.");
+            if (!args[0] || !swap(teams)[args[0].toUpperCase()]) return me.edit("Please specify a team. E.g. `nba roster PHX`.");
 
             let teamIdd = swap(teams)[args[0].toUpperCase()];
 
@@ -673,24 +670,75 @@ message.channel.stopTyping();
                 // embed.setDescription(eDescription);
                 embed.addField("Number", playerNumbers, true);
                 embed.addField("Name", playerNamez, true);
-                message.channel.send(embed);
-                message.channel.stopTyping();
+                me.edit(embed);
             });
 
             break;
-	case 'bracket':
-	    sendEmbed = true;
-	    eImage = "https://ak-static.cms.nba.com/wp-content/uploads/sites/45/2019/04/PlayoffsBracket_042019-1200x560.jpg";
-	    // message.channel.send("https://sportshub-cbsistatic-com.cdn.ampproject.org/ii/w820/s/sportshub.cbsistatic.com/i/r/2019/04/11/b9f7490e-abd5-4923-b050-ffdb9889c73d/resize/750x422/3d11f2c6f6154f5d8db5c393191abf5d/nbaplayoffbracket-041019.jpg");
-	    break;
 
+        case 'bet':
 
+            me = await message.channel.send("Loading...");
+            
+            if (!args[0]) return me.edit(":x: Error: Please specify a team. For example, `nba bet TOR`.");
+
+            request({
+                uri: "http://data.nba.net/10s/prod/v1/20190423/scoreboard.json",
+                json: true
+            }, (e,r,b) => {
+
+                let teamFound = false;
+
+                for (var i=0;i<b.games.length;i++) {
+                    if (b.games[i].hTeam.triCode == args[0].toUpperCase()) {
+                        teamFound = true;
+                        if (b.games[i].statusNum == 1) { // :white_check_mark:
+                            if (!bets.get(message.author.id, "20190423")) bets.set(message.author.id, [], "20190423");
+                            if (bets.get(message.author.id, "20190423").includes(b.games[i].vTeam.triCode)) bets.remove(message.author.id, b.games[i].vTeam.triCode, "20190423");
+                            bets.push(message.author.id, b.games[i].hTeam.triCode, "20190423");
+                            embed = new Discord.RichEmbed()
+                                .setColor(0x4BB543)
+                                .setTitle(":white_check_mark: Success! You have betted on "+b.games[i].hTeam.triCode+" to win against "+b.games[i].vTeam.triCode+".")
+                                return me.edit(embed);
+                        } else {
+                            return me.edit(":x: Error: That team has already started playing. Use `nba scores` to find out the teams which you can bet on.");
+                        }
+                    } else if (b.games[i].vTeam.triCode == args[0].toUpperCase()) {
+                        teamFound = true;
+                        if (b.games[i].statusNum == 1) { // :white_check_mark:
+                            if (!bets.get(message.author.id, "20190423")) bets.set(message.author.id, [], "20190423");
+                            if (bets.get(message.author.id, "20190423").includes(b.games[i].hTeam.triCode)) bets.remove(message.author.id, b.games[i].hTeam.triCode, "20190423");
+                            bets.push(message.author.id, b.games[i].vTeam.triCode, "20190423");
+                            embed = new Discord.RichEmbed()
+                                .setColor(0x4BB543)
+                                .setTitle(":white_check_mark: Success! You have betted on "+b.games[i].vTeam.triCode+" to win against "+b.games[i].hTeam.triCode+".")
+                                return me.edit(embed);
+                        } else {
+                            return me.edit(":x: Error: That team has already started playing. Use `nba scores` to find out the teams which you can bet on.");
+                        }
+                    }
+                }
+
+                if (!teamFound) return me.edit(":x: Error: That team either doesn't exist or isn't playing today.");
+            });
+            
+            break;
+
+        case 'placedbets':
+            if (!bets.get(message.author.id)) return message.channel.send(":x: Error: You haven't placed any bets yet.");
+
+            let teamsBetted = "";
+            for (var key in bets.get(message.author.id)) {
+                if (Array.isArray(bets.get(message.author.id)[key])) {
+                    teamsBetted += (key.substring(0,4)+"/"+key.substring(4,6)+"/"+key.substring(6,8))+": "+bets.get(message.author.id)[key].join(", ")+"\n";
+                }
+            }
+            message.channel.send(teamsBetted);
+            break;
     }
 
     if (sendEmbed) {
         let embed = new Discord.RichEmbed()
             .setTitle(eTitle)
-
             .setColor(0xff4242)
             .setDescription(eDescription)
             .setFooter("nba [command]")
@@ -721,7 +769,6 @@ setInterval(() => {
     }, (e, r, b) => {
         currentDate = b.links.currentDate;
     });
-
     if (clientReady) {
         Boats.postStats(client.guilds.size, "544017840760422417");
         dbl.postStats(client.guilds.size);

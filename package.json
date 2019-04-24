@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/EliotChignell/NBABot#readme",
   "dependencies": {
+    "ascii-table": "0.0.9",
     "better-sqlite-pool": "github:eslachance/better-sqlite-pool",
     "boats.js": "^2.1.2",
     "dblapi.js": "^2.3.0",
