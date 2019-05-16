@@ -3,27 +3,23 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>NBABot</title>
-    <link href="style.css" rel="stylesheet" type="text/css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A Discord bot with live scores, stats, boxscores and more.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/styles.css">
 </head>
 
-<body>
-
-    <div class="mainWrapper">
-        <div class="topHeader">
-            <h1>NBABot
-                <!-- <a href="https://discordapp.com/oauth2/authorize?client_id=544017840760422417&scope=bot&permissions=0" target="_blank" class="link">Invite</a> -->
-            </h1>
+<body style="background-color: #282828;">
+    <div>
+        <div class="container">
+            <div class="row">
+                <div class="col offset-lg-5"><img src="/assets/img/NBABOT-Site.png" style="width: 147px;padding: 17px;"></div>
+            </div>
         </div>
-
-        <br><br><br><br><br>
-
-        <div class="textWrapper">
-
-            <center>
+    </div>
+    <div>
+        <div class="container"><div class="row">
+<center>
                 <a href="https://discordbots.org/bot/544017840760422417">
                     <img src="https://discordbots.org/api/widget/status/544017840760422417.svg?noavatar=true&righttextcolor=FFFFFF"
                         alt="NBABot" />
@@ -40,68 +36,91 @@
                     <img src="https://discordbots.org/api/widget/owner/544017840760422417.svg?noavatar=true&righttextcolor=FFFFFF"
                         alt="NBABot" />
                 </a>
-
-
-                <h1>
-                    <a href="https://discordapp.com/oauth2/authorize?client_id=544017840760422417&scope=bot&permissions=0"
-                        target="_blank" class="code">Add to your server</a><br>
-                    <a href="https://discordbots.org/bot/544017840760422417/vote" target="_blank" class="code">Vote</a>
-                    <a href="https://github.com/EliotChignell/NBABot" target="_blank" class="code">GitHub</a>
-                </h1>
-
-
-            </center>
-
-            <h2>About</h2>
-            <p>NBABot is a Discord bot with live NBA scores, player stats and info, boxscores, standings and much more
-                to come.</p>
-
-            <h2>Commands</h2>
-            <p>These are the commands which you can use with NBABot. Use <a style="color: deepskyblue;">nba help</a> to
-                find out these commands on Discord.</p>
-
-            <h3>NBA Commands</h3>
-            <table style="width: 100%">
-                <tr>
-                    <th>nba scores</th>
-                    <td>Shows you the live scores for today.</td>
-                </tr>
-                <tr>
-                    <th>nba boxscore [team]</th>
-                    <td>Shows you basic stats on the players on that team in the game today. E.g. nba boxscore PHX</td>
-                </tr>
-                <tr>
-                    <th>nba player-stats [player]</th>
-                    <td>Shows you stats on that player. E.g. nba player-stats LeBron James</td>
-                </tr>
-                <tr>
-                    <th>nba player-info [player]</th>
-                    <td>Shows you basic information on that player like height, weight and draft pick. E.g. nba
-                        player-info LeBron James</td>
-                </tr>
-                <tr>
-                    <th>nba standings</th>
-                    <td>Shows you the current league standings.</td>
-                </tr>
-                <tr>
-                    <th>nba standings west</th>
-                    <td>Shows you the current west standings.</td>
-                </tr>
-                <tr>
-                    <th>nba standings east</th>
-                    <td>Shows you the current east standings.</td>
-                </tr>
-                <tr>
-                    <th>nba roster [team]</th>
-                    <td>Shows you the current roster for that team. E.g. nba roster PHX</td>
-                </tr>
-                <tr>
-                    <th>nba teams</th>
-                    <td>A simple command which shows you the current teams in the NBA.</td>
-                </tr>
-            </table>
-          
-            <h3>Betting Guide</h3>
+    </center>
+</div></div>
+    </div>
+    <div>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="table-responsive" style="margin: 0px;padding: 12px;">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th style="color: rgb(201,201,201);background-color: #35383d;font-size: 17px;">About</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="background-color: #3a3e42;color: rgb(255,255,255);height: 32px;">NBABot is a Discord bot with live NBA scores, player stats and info, boxscores, standings and much more to come. The bot is created by Fans, for fans, and the bot is open source to welcome collaboration on something
+                                        that we all love, the NBA!</td>
+                                </tr>
+                                <tr></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div></div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <h1 class="text-center" style="color: rgb(255,255,255);font-weight: bold;">NBA Commands</h1>
+                </div>
+                <div class="col-md-12 col-xl-12">
+                    <div></div>
+                    <header></header>
+                    <div class="table-responsive" style="margin: 0px;padding: 12px;">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th style="color: rgb(201,201,201);background-color: #35383d;font-size: 17px;">Command</th>
+                                    <th style="color: rgb(201,201,201);background-color: #35383d;font-size: 17px;">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="color: rgb(200,16,46);background-color: #35383d;font-size: 17px;">nba scores</td>
+                                    <td style="background-color: #3a3e42;color: rgb(255,255,255);height: 32px;">Shows you the live scores for today.</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: rgb(200,16,46);background-color: #35383d;font-size: 17px;">nba boxscore [team]</td>
+                                    <td style="background-color: #3a3e42;color: rgb(255,255,255);height: 32px;">Shows you basic stats on the players on that team in the game today.&nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: rgb(200,16,46);background-color: #35383d;font-size: 17px;">nba player-stats [player]</td>
+                                    <td style="background-color: #3a3e42;color: rgb(255,255,255);height: 32px;">Shows you stats on that player.</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: rgb(200,16,46);background-color: #35383d;font-size: 17px;">nba player-info [player]</td>
+                                    <td style="background-color: #3a3e42;color: rgb(255,255,255);height: 32px;">Shows you basic information on that player like height, weight and draft pick.</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: rgb(200,16,46);background-color: #35383d;font-size: 17px;">nba standings</td>
+                                    <td style="background-color: #3a3e42;color: rgb(255,255,255);height: 32px;">Shows you the current league standings.</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: rgb(200,16,46);background-color: #35383d;font-size: 17px;">nba standings west</td>
+                                    <td style="background-color: #3a3e42;color: rgb(255,255,255);height: 32px;">Shows you the current Western Conference standings.</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: rgb(200,16,46);background-color: #35383d;font-size: 17px;">nba standings east</td>
+                                    <td style="background-color: #3a3e42;color: rgb(255,255,255);height: 32px;">Shows you the current Eastern Conference standings.</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: rgb(200,16,46);background-color: #35383d;font-size: 17px;">nba roster [team]</td>
+                                    <td style="background-color: #3a3e42;color: rgb(255,255,255);height: 32px;">Shows you the current roster for that team.</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: rgb(200,16,46);background-color: #35383d;font-size: 17px;">nba teams</td>
+                                    <td style="background-color: #3a3e42;color: rgb(255,255,255);height: 32px;">A simple command which shows you the current teams in the NBA.</td>
+                                </tr>
+                                <tr></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <h1 class="text-center" style="color: rgb(255,255,255);font-weight: bold;">Betting Guide</h1><div>
             <p>
                 1. Find out what games are available by using <code>nba betting-scores</code>.<br>
                 2. Bet on a game using <code>nba bet [team]</code> if that team has not started playing today. For example, <code>nba bet PHX</code>.<br>
@@ -112,46 +131,79 @@
                 - To view your unclaimed bets, use <code>nba placedbets</code>.<br>
                 - To view another user's balance, use <code>nba bal @user#1234.</code><br>
                 - To view the leaderboard for the server, use <code>nba leaderboard</code> or <code>nba board</code>.<br>
-                - To view the global leaderboard, use <code>nba board global</code>.<br> 
+                - To view the global leaderboard, use <code>nba board global</code>.<br>
             </p>
-
-            <h3>Other Commands</h3>
-            <table style="width: 100%;">
-                <tr>
-                    <th>nba help</th>
-                    <td>Gives you the list of commands and the link to this page.</td>
-                </tr>
-                <tr>
-                    <th>nba help detailed</th>
-                    <td>Gives you a detailed guide to NBABot's commands.</td>
-                </tr>
-                <tr>
-                    <th>nba ping</th>
-                    <td>Just gives the ping which is how long it takes for the bot to respond.</td>
-                </tr>
-                <tr>
-                    <th>nba uptime</th>
-                    <td>Gives you how long the bot has been online (in its current session).</td>
-                </tr>
-                <tr>
-                    <th>nba invite</th>
-                    <td>Gives you the link to add NBABot to your servers.</td>
-                </tr>
-                <tr>
-                    <th>nba vote</th>
-                    <td>Gives you the link to vote for NBABot.</td>
-                </tr>
-                <tr>
-                    <th>nba github</th>
-                    <td>Gives you the link to the GitHub of NBABot. Feel free to contribute.</td>
-                </tr>
-                <tr>
-                	<th>nba bot-stats</th>
-                	<td>Shows you the amount of servers, channels and users the bot detects.</td>
-                </tr>
-            </table>
+</div></div>
+                <div class="col-md-12">
+                    <div></div>
+                    <header></header>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <h1 class="text-center" style="color: rgb(255,255,255);font-weight: bold;">Other Commmands</h1>
+                </div>
+                <div class="col-md-12 col-xl-12">
+                    <div></div>
+                    <header></header>
+                    <div class="table-responsive" style="margin: 0px;padding: 12px;">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th style="color: rgb(201,201,201);background-color: #35383d;font-size: 17px;">Command</th>
+                                    <th style="color: rgb(201,201,201);background-color: #35383d;font-size: 17px;">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="color: rgb(200,16,46);background-color: #35383d;font-size: 17px;">nba help</td>
+                                    <td style="background-color: #3a3e42;color: rgb(255,255,255);height: 32px;">Gives you the list of commands and the link to this page.</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: rgb(200,16,46);background-color: #35383d;font-size: 17px;">nba help detailed</td>
+                                    <td style="background-color: #3a3e42;color: rgb(255,255,255);height: 32px;">Gives you a detailed guide to NBABot's commands.</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: rgb(200,16,46);background-color: #35383d;font-size: 17px;">nba ping</td>
+                                    <td style="background-color: #3a3e42;color: rgb(255,255,255);height: 32px;">Just gives the ping which is how long it takes for the bot to respond.</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: rgb(200,16,46);background-color: #35383d;font-size: 17px;">nba uptime</td>
+                                    <td style="background-color: #3a3e42;color: rgb(255,255,255);height: 32px;">Gives you how long the bot has been online (in its current session).</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: rgb(200,16,46);background-color: #35383d;font-size: 17px;">nba invite</td>
+                                    <td style="background-color: #3a3e42;color: rgb(255,255,255);height: 32px;">Gives you the link to add NBABot to your servers.</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: rgb(200,16,46);background-color: #35383d;font-size: 17px;">nba vote</td>
+                                    <td style="background-color: #3a3e42;color: rgb(255,255,255);height: 32px;">Gives you the link to vote for NBABot. Voting helps us!</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: rgb(200,16,46);background-color: #35383d;font-size: 17px;">nba github</td>
+                                    <td style="background-color: #3a3e42;color: rgb(255,255,255);height: 32px;">Gives you the link to the GitHub of NBABot. Feel free to contribute. (We're open source!)</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: rgb(200,16,46);background-color: #35383d;font-size: 17px;">nba bot-stats</td>
+                                    <td style="background-color: #3a3e42;color: rgb(255,255,255);height: 32px;">Shows you the amount of servers, channels and users the bot detects.</td>
+                                </tr>
+                                <tr></tr>
+                                <tr></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div></div>
+                    <header></header>
+                </div>
+            </div>
         </div>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
