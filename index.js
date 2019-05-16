@@ -24,7 +24,7 @@ const bets = new Enmap({
     name: "bets"
 });
 client.points = new Enmap({name: "points"});
-const serverList =  new Enmap({name: "serverConfigurations"}); 
+const serverList =  new Enmap({name: "serverConfigurations"});
 
 let clientReady = false;
 
@@ -137,7 +137,7 @@ client.once('ready', () => {
 client.on('message', async message => {
 
     if (!message.guild) return;
-  
+
     serverList.ensure(message.guild.id, {
         prefix: "nba "
     });
@@ -263,7 +263,7 @@ client.on('message', async message => {
                 });
             }
             break;
-        
+
         case 'support':
             message.channel.send("https://discord.gg/Bk8xATx");
             break;
@@ -327,7 +327,7 @@ client.on('message', async message => {
                         } else if (b.games[i].nugget.text) {
                             str2 += "\n" + b.games[i].nugget.text;
                         }
-                        
+
                         if (b.games[i].seasonStageId == 4) {
                             if (b.games[i].statusNum == 3) {
                                 if (parseInt(b.games[i].hTeam.score) > parseInt(b.games[i].vTeam.score)) { // hTeam won
@@ -488,6 +488,7 @@ client.on('message', async message => {
                             .addField("Weight", b.league.standard[i].weightKilograms + "kg", true)
                             .addField("Date of Birth", b.league.standard[i].dateOfBirthUTC, true)
                             .addField("Drafted", draftStr, true)
+                            .setThumbnail("https://ak-static.cms.nba.com/wp-content/uploads/headshots/nba/"+b.league.standard[i].teamId+"/"+ seasonScheduleYear +"/260x190/"+ b.league.standard[i].personId + ".png")
                             .addField("...", "Type `nba player-stats " + args.join(' ') + "` to view stats on that player.");
 
                         me.edit(embed);
@@ -757,7 +758,7 @@ client.on('message', async message => {
                     json: true
                 }, (e, r, b) => {
                     embed = new Discord.RichEmbed()
-                        .setTitle("League Standings:")  
+                        .setTitle("League Standings:")
                         .setColor(0xff4242)
                         .setFooter("nba help")
                         .setTimestamp();
@@ -868,7 +869,7 @@ client.on('message', async message => {
                 var rosterTable = new AsciiTable()
                 rosterTable
                     .setHeading('Number','Name')
-                
+
                 eDescription = "`";
                 let playerNumbers = "";
                 let playerNamez = "";
@@ -887,7 +888,7 @@ client.on('message', async message => {
                 me.edit(embed);
             });
 
-            break;   
+            break;
 
         case 'bet':
 
@@ -964,7 +965,7 @@ client.on('message', async message => {
             if (Object.keys(bets.get(message.author.id)).length < 1) return message.channel.send(":x: Error: You have no bets to claim.");
 
             let betsPlaced = bets.get(message.author.id);
-        
+
             let sentSomething = false;
 
             for (var key in betsPlaced) {
@@ -976,19 +977,19 @@ client.on('message', async message => {
                     uri: "http://data.nba.net/10s/prod/v1/" + key + "/scoreboard.json",
                     json: true
                 }, (e,r,b) => {
-                    
+
                     let resultStr = "__"+(key.substring(0, 4) + "/" + key.substring(4, 6) + "/" + key.substring(6, 8))+"__\n";
                     let teamsDone = [];
-                    
+
                     for (var i=0;i<betsPlaced[key].length;i++) {
-                        
+
                         for (var j=0;j<b.games.length;j++) {
 
                             if (b.games[j].statusNum != 3) continue;
 
                             let hTeamScore = parseInt(b.games[j].hTeam.score);
                             let vTeamScore = parseInt(b.games[j].vTeam.score);
-                            
+
                             if ((betsPlaced[key][i] == b.games[j].hTeam.triCode) && b.games[j].statusNum == 3) { // Guessed hTeam
                                 message.channel.send("Sent you a DM with your results!");
                                 if (hTeamScore > vTeamScore) { // Guessed Correctly
@@ -1014,16 +1015,16 @@ client.on('message', async message => {
                             }
 
                         }
-                      
+
                         if (resultStr == "__"+(key.substring(0, 4) + "/" + key.substring(4, 6) + "/" + key.substring(6, 8))+"__\n") resultStr = "";
-                        
+
                     }
-                  
+
                     if (resultStr != "") {
                         message.author.send(resultStr);
                     }
                 });
-                
+
                 if (betsPlaced[key].length == 0) {
                     bets.delete(message.author.id, key);
                     continue;
@@ -1064,7 +1065,7 @@ client.on('message', async message => {
                     .addField("Accuracy",Math.floor((client.points.get(user.id, "correct")/(client.points.get(user.id, "correct")+client.points.get(user.id, "wrong")))*100)+"%", true)
                     .addField("Total Points",client.points.get(user.id, "points"), true)
                     message.channel.send(embed);
-            } 
+            }
             break;
 
         case 'leaderboard':
@@ -1098,7 +1099,7 @@ client.on('message', async message => {
 
                 embed.addField("...","Type `nba leaderboard global` to view the global top 10.");
                 message.channel.send(embed);
-                
+
             } else if (args[0]) { // Global Leaderboard
                 let sorted = client.points.array().sort((a, b) => a.points - b.points).reverse().splice(0,10);
                 console.log(sorted);
@@ -1187,9 +1188,9 @@ client.on('message', async message => {
                 }
                 me.edit(embed);
             });
-            
+
             break;
-        
+
         /* Server-specific configurations
         case 'prefix':
             if (!args[0]) {
@@ -1201,7 +1202,7 @@ client.on('message', async message => {
                     message.channel.send(embed);
             }
             break; */
-            
+
     }
 
     if (sendEmbed) {
@@ -1237,12 +1238,12 @@ setInterval(() => {
     }, (e, r, b) => {
         currentDate = b.links.currentDate;
     });
-    
+
     if (clientReady) {
         Boats.postStats(client.guilds.size, "544017840760422417");
         dbl.postStats(client.guilds.size);
     }
-    
+
 }, 60000);
 
 setInterval(() => {
