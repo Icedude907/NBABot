@@ -144,7 +144,7 @@ client.on('message', async message => {
 
     if (message.content == "stop") message.channel.stopTyping();
 
-    if (message.content.split(' ')[0].toLowerCase() != "nba" || message.author.bot) return;
+    if (message.content.split(' ')[0].toLowerCase() != "nba") return;
 
     bets.ensure(message.author.id, {});
     client.points.ensure(message.author.id, {
