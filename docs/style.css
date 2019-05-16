@@ -85,3 +85,7 @@ tr:nth-child(even) {
 .c {
     width: 400px;
 }
+
+code {
+    color: deepskyblue;
+}

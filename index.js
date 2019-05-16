@@ -23,7 +23,8 @@ const prefix = "nba ";
 const bets = new Enmap({
     name: "bets"
 });
-client.points = new Enmap({name: "points"}); 56
+client.points = new Enmap({name: "points"});
+const serverList =  new Enmap({name: "serverConfigurations"}); 
 
 let clientReady = false;
 
@@ -32,7 +33,10 @@ let currentScoreboard,
     seasonScheduleYear,
     players = {},
     teams = {},
-    jerseyNumbers = {};
+    jerseyNumbers = {},
+    nicknames = {},
+    triCodes = {},
+    lowerCaseNicknames = {};
 
 const teamLogoURLs = {
     ATL: "http://loodibee.com/wp-content/uploads/nba-atlanta-hawks-logo-300x300.png",
@@ -107,7 +111,13 @@ client.once('ready', () => {
             json: true
         }, (e, r, b) => {
             for (var i = 0; i < b.league.standard.length; i++) {
-                if (b.league.standard[i].isNBAFranchise) teams[b.league.standard[i].teamId] = b.league.standard[i];
+                if (b.league.standard[i].isNBAFranchise) {
+                	if (b.league.standard[i].nickname == "Trail Blazers") b.league.standard[i].nickname = "Blazers";
+                    teams[b.league.standard[i].teamId] = b.league.standard[i];
+                    nicknames[b.league.standard[i].tricode] = b.league.standard[i].nickname;
+                    triCodes[b.league.standard[i].nickname.toLowerCase()] = b.league.standard[i].tricode;
+                    lowerCaseNicknames[b.league.standard[i].tricode] = b.league.standard[i].nickname.toLowerCase();
+                }
             }
         });
     });
@@ -119,12 +129,18 @@ client.once('ready', () => {
         currentDate = b.links.currentDate;
     });
 
-    client.user.setActivity("nba help | nbabot.js.org | " + client.guilds.size + " servers", {
+    client.user.setActivity("nba help | nbabot.js.org | " + client.guilds.size + " servers, thanks for 250! :)", {
         type: "PLAYING"
     });
 });
 
 client.on('message', async message => {
+
+    if (!message.guild) return;
+  
+    serverList.ensure(message.guild.id, {
+        prefix: "nba "
+    });
 
     if (message.content == "stop") message.channel.stopTyping();
 
@@ -168,8 +184,8 @@ client.on('message', async message => {
                     .setTimestamp()
                     .addField("NBA Commands", "`nba scores`\n`nba player-info [player]`\n`nba player-stats [player]`\n`nba boxscore [team]`\n`nba teams`\n`nba standings`\n`nba standings [east/west]`\n`nba roster [team]`")
                     .addField("Betting Commands", "Type `nba betting-help` to view a guide on the betting process.")
-                    .addField("Other Commands", "`nba help` `nba ping` `nba uptime` `nba invite` `nba vote` `nba github` `nba bot-stats`")
-                    .setDescription("To view detailed usage, visit [nbabot.js.org](https://nbabot.js.org/) or use `nba help detailed`.")
+                    .addField("Other Commands", "`nba help` `nba ping` `nba uptime` `nba invite` `nba vote` `nba github` `nba bot-stats` `nba support`")
+                    .setDescription("To view detailed usage, visit [nbabot.js.org](https://nbabot.js.org/) or use `nba help detailed`.\nYou can join the support server [here](https://discord.gg/Bk8xATx)")
                 message.channel.send(embed);
             } else if (args[0]) {
                 message.channel.send("Sent you a DM containing help information.");
@@ -178,6 +194,7 @@ client.on('message', async message => {
                     .setColor(0xff4242)
                     .setFooter("nba help")
                     .setTimestamp()
+                    .setDescription("You can join the support server [here](https://discord.gg/Bk8xATx)")
                     // .addField("NBA Commands", "`nba scores`\nShows you the live scores for today.\n`nba player-info [player]`\nShows you basic stats on the players on that team in the game today. E.g. nba boxscore PHX\n`nba player-stats [player]`\nShows you stats on that player. E.g. nba player-stats LeBron James\n`nba boxscore [team]`\nShows you basic information on that player like height, weight and draft pick. E.g. nba player-info LeBron James\n`nba teams`\nShows you the teams for the current season.\n`nba standings`\nShows you the current league standings.\n`nba standings [east/west]`\nShows you the current east/west standings.\n`nba roster [team]`\nShows you the current roster for that team. E.g. nba roster PHX")
                     .addField("nba scores", "Shows you the live scores for today.")
                     .addField("nba boxscore [team]", "Shows you basic stats on the players on that team in the game today. E.g. nba boxscore PHX.")
@@ -186,7 +203,7 @@ client.on('message', async message => {
                     .addField("nba standings", "Shows you the current league standings.")
                     .addField("nba standings west/east", "Shows you the current west/east standings.")
                     .addField("nba roster [team]", "Shows you the current roster for that team. E.g. nba roster PHX")
-                    .addField("Other Commands", "`nba help` `nba ping` `nba uptime` `nba invite` `nba vote` `nba github` `nba bot-stats`")
+                    .addField("Other Commands", "`nba help` `nba ping` `nba uptime` `nba invite` `nba vote` `nba github` `nba bot-stats` `nba support`")
                 message.author.send(embed);
             }
             break;
@@ -225,10 +242,10 @@ client.on('message', async message => {
         case 'bot-stats':
             embed = new Discord.RichEmbed()
                 .setTitle("Stats on NBABot:")
-
                 .setColor(0xff4242)
                 .setFooter("nba help")
                 .setTimestamp()
+                .setDescription("Development started Feb 10 2019.")
                 .addField("Servers", client.guilds.size, true)
                 .addField("Channels", client.channels.size, true)
                 .addField("Users", client.users.size, true);
@@ -245,6 +262,10 @@ client.on('message', async message => {
                     message.author.send(g.name + " " + g.members.size);
                 });
             }
+            break;
+        
+        case 'support':
+            message.channel.send("https://discord.gg/Bk8xATx");
             break;
 
         case 'scores':
@@ -275,12 +296,15 @@ client.on('message', async message => {
 
                         if (b.games[i].statusNum == 2) str += ":red_circle: ";
 
+                        b.games[i].hTeam.triCode = nicknames[b.games[i].hTeam.triCode];
+                        b.games[i].vTeam.triCode = nicknames[b.games[i].vTeam.triCode];
+
                         if (b.games[i].statusNum == 3) {
                             if (parseInt(b.games[i].hTeam.score) > parseInt(b.games[i].vTeam.score)) { // hTeam won
-                                console.log(b.games[i].hTeam.triCode+" won, "+b.games[i].hTeam.score+" > "+b.games[i].vTeam.score);
+                                // console.log(b.games[i].hTeam.triCode+" won, "+b.games[i].hTeam.score+" > "+b.games[i].vTeam.score);
                                 str += b.games[i].vTeam.triCode + " " + b.games[i].vTeam.score + " - **" + b.games[i].hTeam.score + " " + b.games[i].hTeam.triCode + "**";
                             } else if (parseInt(b.games[i].vTeam.score) > parseInt(b.games[i].hTeam.score)) { // vTeam won
-                                console.log(b.games[i].vTeam.triCode+" won, "+b.games[i].vTeam.score+" > "+b.games[i].hTeam.score);
+                                // console.log(b.games[i].vTeam.triCode+" won, "+b.games[i].vTeam.score+" > "+b.games[i].hTeam.score);
                                 str += "**" + b.games[i].vTeam.triCode + " " + b.games[i].vTeam.score + "** - " + b.games[i].hTeam.score + " " + b.games[i].hTeam.triCode;
                             }
                         } else {
@@ -302,6 +326,31 @@ client.on('message', async message => {
                             str2 = "...";
                         } else if (b.games[i].nugget.text) {
                             str2 += "\n" + b.games[i].nugget.text;
+                        }
+                        
+                        if (b.games[i].seasonStageId == 4) {
+                            if (b.games[i].statusNum == 3) {
+                                if (parseInt(b.games[i].hTeam.score) > parseInt(b.games[i].vTeam.score)) { // hTeam won
+                                    b.games[i].hTeam.seriesWin++;
+                                } else if (parseInt(b.games[i].vTeam.score) > parseInt(b.games[i].hTeam.score)) { // vTeam won
+                                    b.games[i].vTeam.seriesWin++;
+                                }
+                            }
+                            if (parseInt(b.games[i].hTeam.seriesWin) > parseInt(b.games[i].vTeam.seriesWin)) { // hTeam leading series
+                                if (parseInt(b.games[i].hTeam.seriesWin) == 4) {
+                                    str += " | " + b.games[i].hTeam.triCode + " won series, " + b.games[i].hTeam.seriesWin + "-" + b.games[i].vTeam.seriesWin;
+                                } else {
+                                    str += " | " + b.games[i].hTeam.triCode + " leads series, " + b.games[i].hTeam.seriesWin + "-" + b.games[i].vTeam.seriesWin;
+                                }
+                            } else if (parseInt(b.games[i].hTeam.seriesWin) < parseInt(b.games[i].vTeam.seriesWin)) { // vTeam leading series
+                                if (parseInt(b.games[i].vTeam.seriesWin) == 4) {
+                                    str += " | " + b.games[i].vTeam.triCode + " won series, " + b.games[i].vTeam.seriesWin + "-" + b.games[i].hTeam.seriesWin;
+                                } else {
+                                    str += " | " + b.games[i].vTeam.triCode + " leads series, " + b.games[i].vTeam.seriesWin + "-" + b.games[i].hTeam.seriesWin;
+                                }
+                            } else if (parseInt(b.games[i].hTeam.seriesWin) == parseInt(b.games[i].vTeam.seriesWin)) {// Series tied
+                                str += " | Series tied, " + b.games[i].hTeam.seriesWin + "-" + b.games[i].vTeam.seriesWin;
+                            }
                         }
                         try {
                             embed.addField(str, str2);
@@ -333,13 +382,17 @@ client.on('message', async message => {
                     uri: "http://data.nba.net/10s/prod/v1/" + date + "/scoreboard.json",
                     json: true
                 }, (e, r, b) => {
-                    if (b == undefined) return me.edit(":x: Error: Unfortunately, the NBA API does not have anything to show on that date.");
+                    if (e) return me.edit(":x: Error: Unfortunately, the NBA API does not have anything to show on that date. The API only supports from the 2014-15 season onwards.");
+                    if (b == undefined) return me.edit(":x: Error: Unfortunately, the NBA API does not have anything to show on that date. The API only supports from the 2014-15 season onwards.");
                     for (var i = 0; i < b.games.length; i++) {
 
                         let str = "";
                         let str2 = "";
 
                         if (b.games[i].statusNum == 2) str += ":red_circle: ";
+
+                        b.games[i].hTeam.triCode = nicknames[b.games[i].hTeam.triCode];
+                        b.games[i].vTeam.triCode = nicknames[b.games[i].vTeam.triCode];
 
                         if (b.games[i].statusNum == 3) {
                             if (parseInt(b.games[i].hTeam.score) > parseInt(b.games[i].vTeam.score)) { // hTeam won
@@ -368,6 +421,30 @@ client.on('message', async message => {
                             str2 = "...";
                         } else if (b.games[i].nugget.text) {
                             str2 += "\n" + b.games[i].nugget.text;
+                        }
+                        if (b.games[i].seasonStageId == 4) {
+                            if (b.games[i].statusNum == 3) {
+                                if (parseInt(b.games[i].hTeam.score) > parseInt(b.games[i].vTeam.score)) { // hTeam won
+                                    b.games[i].hTeam.seriesWin++;
+                                } else if (parseInt(b.games[i].vTeam.score) > parseInt(b.games[i].hTeam.score)) { // vTeam won
+                                    b.games[i].vTeam.seriesWin++;
+                                }
+                            }
+                            if (parseInt(b.games[i].hTeam.seriesWin) > parseInt(b.games[i].vTeam.seriesWin)) { // hTeam leading series
+                                if (parseInt(b.games[i].hTeam.seriesWin) == 4) {
+                                    str += " | " + b.games[i].hTeam.triCode + " won series, " + b.games[i].hTeam.seriesWin + "-" + b.games[i].vTeam.seriesWin;
+                                } else {
+                                    str += " | " + b.games[i].hTeam.triCode + " leads series, " + b.games[i].hTeam.seriesWin + "-" + b.games[i].vTeam.seriesWin;
+                                }
+                            } else if (parseInt(b.games[i].hTeam.seriesWin) < parseInt(b.games[i].vTeam.seriesWin)) { // vTeam leading series
+                                if (parseInt(b.games[i].vTeam.seriesWin) == 4) {
+                                    str += " | " + b.games[i].vTeam.triCode + " won series, " + b.games[i].vTeam.seriesWin + "-" + b.games[i].hTeam.seriesWin;
+                                } else {
+                                    str += " | " + b.games[i].vTeam.triCode + " leads series, " + b.games[i].vTeam.seriesWin + "-" + b.games[i].hTeam.seriesWin;
+                                }
+                            } else if (parseInt(b.games[i].hTeam.seriesWin) == parseInt(b.games[i].vTeam.seriesWin)) {// Series tied
+                                str += " | Series tied, " + b.games[i].hTeam.seriesWin + "-" + b.games[i].vTeam.seriesWin;
+                            }
                         }
                         try {
                             embed.addField(str, str2);
@@ -439,6 +516,8 @@ client.on('message', async message => {
 
                     let desiredName;
 
+                    /*
+
                     if (args.length == 3) {
                         if (args[2].toLowerCase == "-c" || args[2].toLowerCase == "-r") {
                             desiredName = args[0] + " " + args[1];
@@ -449,6 +528,15 @@ client.on('message', async message => {
                         desiredName = args[0] + " " + args[1] + " " + args[2];
                     } else if (args.length == 2) {
                         desiredName = args[0] + " " + args[1];
+                    }
+
+                    */
+
+                    if (args[args.length-1].toLowerCase() == "-c" || args[args.length-1].toLowerCase() == "-r") {
+                        args.pop();
+                        desiredName = args.join(' ');
+                    } else {
+                        desiredName = args.join(' ');
                     }
 
                     if ((b.league.standard[i].firstName.toLowerCase() + " " + b.league.standard[i].lastName.toLowerCase()) == desiredName.toLowerCase()) {
@@ -551,8 +639,9 @@ client.on('message', async message => {
         case 'b':
         case 'bs':
 
-            if (!args[0]) return message.channel.send("Please specify a team. E.g. `nba boxscore PHX`.");
-
+            if (!args[0]) return message.channel.send("Please specify a team. E.g. `nba boxscore PHX` or `nba boxscore Suns`.");
+            if (!Object.keys(nicknames).includes(args[0].toUpperCase()) && !Object.values(lowerCaseNicknames).includes(args[0].toLowerCase())) return message.channel.send("Please specify a valid team. E.g. `nba boxscore PHX` or `nba boxscore Suns`.");
+            if (Object.values(lowerCaseNicknames).includes(args[0].toLowerCase())) args[0] = triCodes[args[0].toLowerCase()];
             let gameFound = false;
 
             me = await message.channel.send("Loading...");
@@ -629,7 +718,7 @@ client.on('message', async message => {
                             embed.setDescription(description);
                             me.edit(embed);
                         } else {
-                            me.edit("```ml\n" + table.toString() + "```**On Mobile?** Use `nba boxscore " + args[0] + " -m`.");
+                            me.edit("```ml\n" + table.toString() + "```**On Mobile?** Use `nba boxscore " + args[0] + " -m` or try rotating your device to landscape mode.");
                         }
 
                     });
@@ -645,7 +734,6 @@ client.on('message', async message => {
         case 'teams':
             embed = new Discord.RichEmbed()
                 .setTitle("Teams for the " + seasonScheduleYear + "/" + (parseInt(seasonScheduleYear) + 1) + " season:")
-
                 .setColor(0xff4242)
                 .setFooter("nba help")
                 .setTimestamp();
@@ -669,8 +757,7 @@ client.on('message', async message => {
                     json: true
                 }, (e, r, b) => {
                     embed = new Discord.RichEmbed()
-                        .setTitle("League Standings:")
-
+                        .setTitle("League Standings:")  
                         .setColor(0xff4242)
                         .setFooter("nba help")
                         .setTimestamp();
@@ -761,7 +848,9 @@ client.on('message', async message => {
 
             me = await message.channel.send("Loading...");
 
-            if (!args[0] || !swap(teams)[args[0].toUpperCase()]) return me.edit("Please specify a team. E.g. `nba roster PHX`.");
+            if (!args[0]) return me.edit("Please specify a team. E.g. `nba roster PHX`.");
+            if (!Object.keys(nicknames).includes(args[0].toUpperCase()) && !Object.values(lowerCaseNicknames).includes(args[0].toLowerCase())) return message.channel.send("Please specify a valid team. E.g. `nba roster PHX` or `nba roster Suns`.");
+            if (Object.values(lowerCaseNicknames).includes(args[0].toLowerCase())) args[0] = triCodes[args[0].toLowerCase()];
 
             let teamIdd = swap(teams)[args[0].toUpperCase()];
 
@@ -775,19 +864,26 @@ client.on('message', async message => {
                     .setFooter("nba help")
                     .setThumbnail(teamLogoURLs[teams[teamIdd].tricode])
                     .setTimestamp();
+
+                var rosterTable = new AsciiTable()
+                rosterTable
+                    .setHeading('Number','Name')
+                
                 eDescription = "`";
                 let playerNumbers = "";
                 let playerNamez = "";
 
                 for (var i = 0; i < b.league.standard.players.length; i++) {
-                    playerNamez += players[b.league.standard.players[i].personId] + "\n";
-                    playerNumbers += jerseyNumbers[b.league.standard.players[i].personId] + "\n";
+                    // playerNamez += players[b.league.standard.players[i].personId] + "\n";
+                    // playerNumbers += jerseyNumbers[b.league.standard.players[i].personId] + "\n";
+                    rosterTable.addRow(jerseyNumbers[b.league.standard.players[i].personId], players[b.league.standard.players[i].personId]);
                 }
 
                 eDescription += "`";
                 // embed.setDescription(eDescription);
-                embed.addField("Number", playerNumbers, true);
-                embed.addField("Name", playerNamez, true);
+                // embed.addField("Number", playerNumbers, true);
+                // embed.addField("Name", playerNamez, true);
+                embed.setDescription("```" + rosterTable.toString() + "```");
                 me.edit(embed);
             });
 
@@ -797,7 +893,9 @@ client.on('message', async message => {
 
             me = await message.channel.send("Loading...");
 
-            if (!args[0]) return me.edit(":x: Error: Please specify a team. For example, `nba bet TOR`.");
+            if (!args[0]) return me.edit(":x: Error: Please specify a team. For example, `nba bet TOR` or `nba bet Raptors`.");
+            if (!Object.keys(nicknames).includes(args[0].toUpperCase()) && !Object.values(lowerCaseNicknames).includes(args[0].toLowerCase())) return message.channel.send("Please specify a valid team. E.g. `nba bet PHX` or `nba bet Suns`.");
+            if (Object.values(lowerCaseNicknames).includes(args[0].toLowerCase())) args[0] = triCodes[args[0].toLowerCase()];
 
             request({
                 uri: "http://data.nba.net/10s/prod/v1/" + currentDate + "/scoreboard.json",
@@ -815,10 +913,10 @@ client.on('message', async message => {
                             bets.push(message.author.id, b.games[i].hTeam.triCode, currentDate);
                             embed = new Discord.RichEmbed()
                                 .setColor(0x4BB543)
-                                .setTitle(":white_check_mark: Success! You have betted on " + b.games[i].hTeam.triCode + " to win against " + b.games[i].vTeam.triCode + ".")
+                                .setTitle(":white_check_mark: Success! You have betted on " + b.games[i].hTeam.triCode + " to win against " + b.games[i].vTeam.triCode + ". Remember to `nba claim` once the game has finished.")
                             return me.edit(embed);
                         } else {
-                            return me.edit(":x: Error: That team has already started playing. Use `nba scores` to find out the teams which you can bet on.");
+                            return me.edit(":x: Error: That team has already started playing. Use `nba betting-scores` to find out the teams which you can bet on.");
                         }
                     } else if (b.games[i].vTeam.triCode == args[0].toUpperCase()) { // Betted vTeam
                         teamFound = true;
@@ -828,28 +926,37 @@ client.on('message', async message => {
                             bets.push(message.author.id, b.games[i].vTeam.triCode, currentDate);
                             embed = new Discord.RichEmbed()
                                 .setColor(0x4BB543)
-                                .setTitle(":white_check_mark: Success! You have betted on " + b.games[i].vTeam.triCode + " to win against " + b.games[i].hTeam.triCode + ".")
+                                .setTitle(":white_check_mark: Success! You have betted on " + b.games[i].vTeam.triCode + " to win against " + b.games[i].hTeam.triCode + ". Remember to `nba claim` once the game has finished.")
                             return me.edit(embed);
                         } else {
-                            return me.edit(":x: Error: That team has already started playing. Use `nba scores` to find out the teams which you can bet on.");
+                            return me.edit(":x: Error: That team has already started playing. Use `nba betting-scores` to find out the teams which you can bet on.");
                         }
                     }
                 }
 
-                if (!teamFound) return me.edit(":x: Error: That team either doesn't exist or isn't playing today.");
+                if (!teamFound) return me.edit(":x: Error: That team either doesn't exist or isn't playing today. This bot _currently_ operates on a system where the teams are represented by 3 letter codes. Use `nba teams` to familiarise yourself with these teams.");
             });
 
             break;
 
         case 'placedbets':
+        case 'unclaimedbets':
             if (!bets.get(message.author.id)) return message.channel.send(":x: Error: You haven't placed any bets yet.");
             if (Object.keys(bets.get(message.author.id)).length < 1) return message.channel.send(":x: Error: You have no bets to claim.");
+
+            embed = new Discord.RichEmbed()
+                .setColor(0xff4242)
+                .setTitle("Your unclaimed bets:")
+                .setFooter("nba help")
+                .setTimestamp();
 
             let teamsBetted = "";
             for (var key in bets.get(message.author.id)) {
                 teamsBetted += (key.substring(0, 4) + "/" + key.substring(4, 6) + "/" + key.substring(6, 8)) + ": " + bets.get(message.author.id)[key].join(", ") + "\n";
             }
-            message.channel.send(teamsBetted);
+
+            embed.setDescription(teamsBetted);
+            message.channel.send(embed);
             break;
 
         case 'claim':
@@ -857,8 +964,14 @@ client.on('message', async message => {
             if (Object.keys(bets.get(message.author.id)).length < 1) return message.channel.send(":x: Error: You have no bets to claim.");
 
             let betsPlaced = bets.get(message.author.id);
+        
+            let sentSomething = false;
 
             for (var key in betsPlaced) {
+                if (betsPlaced[key].length == 0) {
+                    bets.delete(message.author.id, key);
+                    continue;
+                }
                 request({
                     uri: "http://data.nba.net/10s/prod/v1/" + key + "/scoreboard.json",
                     json: true
@@ -871,10 +984,13 @@ client.on('message', async message => {
                         
                         for (var j=0;j<b.games.length;j++) {
 
+                            if (b.games[j].statusNum != 3) continue;
+
                             let hTeamScore = parseInt(b.games[j].hTeam.score);
                             let vTeamScore = parseInt(b.games[j].vTeam.score);
                             
-                            if (betsPlaced[key][i] == b.games[j].hTeam.triCode && b.games[j].statusNum == 3) { // Guessed hTeam
+                            if ((betsPlaced[key][i] == b.games[j].hTeam.triCode) && b.games[j].statusNum == 3) { // Guessed hTeam
+                                message.channel.send("Sent you a DM with your results!");
                                 if (hTeamScore > vTeamScore) { // Guessed Correctly
                                     client.points.inc(message.author.id, "correct");
                                     client.points.inc(message.author.id, "points");
@@ -884,7 +1000,8 @@ client.on('message', async message => {
                                     resultStr += b.games[j].hTeam.triCode+" guessed incorrectly (+0 pts)\n";
                                 }
                                 bets.remove(message.author.id, betsPlaced[key][i], key);
-                            } else if (betsPlaced[key][i] == b.games[j].vTeam.triCode && b.games[j].statusNum == 3) { // Guessed vTeam
+                            } else if ((betsPlaced[key][i] == b.games[j].vTeam.triCode) && b.games[j].statusNum == 3) { // Guessed vTeam
+                                message.channel.send("Sent you a DM with your results!");
                                 if (vTeamScore > hTeamScore) { // Guessed Correctly
                                     client.points.inc(message.author.id, "correct");
                                     client.points.inc(message.author.id, "points");
@@ -897,12 +1014,20 @@ client.on('message', async message => {
                             }
 
                         }
+                      
+                        if (resultStr == "__"+(key.substring(0, 4) + "/" + key.substring(4, 6) + "/" + key.substring(6, 8))+"__\n") resultStr = "";
                         
                     }
-                    
-                    message.author.send(resultStr);
-                
+                  
+                    if (resultStr != "") {
+                        message.author.send(resultStr);
+                    }
                 });
+                
+                if (betsPlaced[key].length == 0) {
+                    bets.delete(message.author.id, key);
+                    continue;
+                }
             }
 
             break;
@@ -1064,6 +1189,18 @@ client.on('message', async message => {
             });
             
             break;
+        
+        /* Server-specific configurations
+        case 'prefix':
+            if (!args[0]) {
+                embed = new Discord.RichEmbed()
+                    .setColor(0x3498DB)
+                    .setFooter("nba help")
+                    .setTimestamp()
+                    .setTitle(`The prefix for this server, ${message.guild.name}, is "${serverList.get(message.guild.id, "prefix")}"`)
+                    message.channel.send(embed);
+            }
+            break; */
             
     }
 
@@ -1118,7 +1255,7 @@ setInterval(() => {
 }, 86400000);
 
 setInterval(() => {
-    client.user.setActivity("nba help | nbabot.js.org | " + client.guilds.size + " servers", {
+    client.user.setActivity("nba help | nbabot.js.org | " + client.guilds.size + " servers, thanks for 250! :)", {
         type: "PLAYING"
     });
 }, 60000);
