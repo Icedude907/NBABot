@@ -277,7 +277,7 @@ client.on('message', async message => {
         case 'live':
 
             if (!args[0]) {
-                me = await message.channel.send("Loading...");
+                me = await message.channel.send(":timer: Loading...");
 
                 embed = new Discord.RichEmbed()
                     .setTitle("Scores for today:")
@@ -370,7 +370,7 @@ client.on('message', async message => {
 
                 let date = args[0].split('/').join('');
 
-                me = await message.channel.send("Loading...");
+                me = await message.channel.send(":timer: Loading...");
 
                 embed = new Discord.RichEmbed()
                     .setTitle("Scores for the date "+args[0]+":")
@@ -460,7 +460,7 @@ client.on('message', async message => {
 
         case 'player-info':
 
-            me = await message.channel.send("Loading...");
+            me = await message.channel.send(":timer: Loading...");
 
             if (!args[0] || !args[1] || args[0].split('').includes("[") || args[1].split('').includes("]")) return me.edit("Please specifiy a player, e.g. `nba player-info lebron james`");
             playerFound = false;
@@ -475,19 +475,22 @@ client.on('message', async message => {
                         playerFound = true;
                         let draftStr = "#" + b.league.standard[i].draft.pickNum + " (" + b.league.standard[i].draft.seasonYear + ")";
                         if (draftStr == "# ()") draftStr = "Undrafted";
+                        let schoolStr = b.league.standard[i].collegeName;
+                        if (schoolStr == "") schoolStr = "Unlisted";
                         let embed = new Discord.RichEmbed()
-                            .setTitle("Basic Information on the player `" + b.league.standard[i].firstName + " " + b.league.standard[i].lastName + "`:")
+                            .setTitle("🏀 Basic Information for `" + b.league.standard[i].firstName + " " + b.league.standard[i].lastName + "`:")
 
                             .setColor(0xff4242)
                             // .setDescription("Jersey Number: `" + b.league.standard[i].jersey + "`\nPosition: `" + b.league.standard[i].pos + "`\nHeight: `" + b.league.standard[i].heightFeet + "'" + b.league.standard[i].heightInches + '" (' + b.league.standard[i].heightMeters + "m)`\nWeight: `" + b.league.standard[i].weightKilograms + "kg`\nDate of Birth: `" + b.league.standard[i].dateOfBirthUTC + "`\nDrafted: " + draftStr + "\n\n_Type `nba player-stats " + args[0] + " " + args[1] + "` to view stats on that player._")
                             .setFooter("nba help")
                             .setTimestamp()
-                            .addField("Jersey Number", b.league.standard[i].jersey, true)
-                            .addField("Position", b.league.standard[i].pos, true)
-                            .addField("Height", b.league.standard[i].heightFeet + "'" + b.league.standard[i].heightInches + '" (' + b.league.standard[i].heightMeters + "m)", true)
-                            .addField("Weight", b.league.standard[i].weightKilograms + "kg", true)
-                            .addField("Date of Birth", b.league.standard[i].dateOfBirthUTC, true)
-                            .addField("Drafted", draftStr, true)
+                            .addField("**Jersey Number**", b.league.standard[i].jersey, true)
+                            .addField("**Position**", b.league.standard[i].pos, true)
+                            .addField("**Height**", b.league.standard[i].heightFeet + "'" + b.league.standard[i].heightInches + '" (' + b.league.standard[i].heightMeters + "m)", true)
+                            .addField("**Weight**", b.league.standard[i].weightKilograms + "kg", true)
+                            .addField("**Date of Birth**", b.league.standard[i].dateOfBirthUTC, true)
+                            .addField("**Drafted**", draftStr, true)
+                            .addField("**College**", schoolStr, true)
                             .setThumbnail("https://ak-static.cms.nba.com/wp-content/uploads/headshots/nba/"+b.league.standard[i].teamId+"/"+ seasonScheduleYear +"/260x190/"+ b.league.standard[i].personId + ".png")
                             .addField("...", "Type `nba player-stats " + args.join(' ') + "` to view stats on that player.");
 
@@ -506,7 +509,7 @@ client.on('message', async message => {
             if (!args[0] || !args[1] || args[0].split('').includes("[") || args[1].split('').includes(']')) return message.channel.send("Please specifiy a player, e.g. `nba player-stats lebron james`");
             playerFound = false;
 
-            me = await message.channel.send("Loading...");
+            me = await message.channel.send(":timer: Loading...");
 
             request({
                 uri: 'http://data.nba.net/10s/prod/v1/' + seasonScheduleYear + '/players.json',
@@ -645,7 +648,7 @@ client.on('message', async message => {
             if (Object.values(lowerCaseNicknames).includes(args[0].toLowerCase())) args[0] = triCodes[args[0].toLowerCase()];
             let gameFound = false;
 
-            me = await message.channel.send("Loading...");
+            me = await message.channel.send(":timer: Loading...");
 
             request({
                 uri: "http://data.nba.net/10s/prod/v1/" + currentDate + "/scoreboard.json",
@@ -749,7 +752,7 @@ client.on('message', async message => {
 
         case 'standings':
 
-            me = await message.channel.send("Loading...");
+            me = await message.channel.send(":timer: Loading...");
 
             if (!args[0]) {
                 // League Standings
@@ -847,7 +850,7 @@ client.on('message', async message => {
 
         case 'roster':
 
-            me = await message.channel.send("Loading...");
+            me = await message.channel.send(":timer: Loading...");
 
             if (!args[0]) return me.edit("Please specify a team. E.g. `nba roster PHX`.");
             if (!Object.keys(nicknames).includes(args[0].toUpperCase()) && !Object.values(lowerCaseNicknames).includes(args[0].toLowerCase())) return message.channel.send("Please specify a valid team. E.g. `nba roster PHX` or `nba roster Suns`.");
@@ -892,7 +895,7 @@ client.on('message', async message => {
 
         case 'bet':
 
-            me = await message.channel.send("Loading...");
+            me = await message.channel.send(":timer: Loading...");
 
             if (!args[0]) return me.edit(":x: Error: Please specify a team. For example, `nba bet TOR` or `nba bet Raptors`.");
             if (!Object.keys(nicknames).includes(args[0].toUpperCase()) && !Object.values(lowerCaseNicknames).includes(args[0].toLowerCase())) return message.channel.send("Please specify a valid team. E.g. `nba bet PHX` or `nba bet Suns`.");
@@ -1132,7 +1135,7 @@ client.on('message', async message => {
 
         case 'betting-scores':
 
-            me = await message.channel.send("Loading...");
+            me = await message.channel.send(":timer: Loading...");
 
             embed = new Discord.RichEmbed()
                 .setTitle("Games available to bet on:")
