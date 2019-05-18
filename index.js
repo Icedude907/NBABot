@@ -129,7 +129,7 @@ client.once('ready', () => {
         currentDate = b.links.currentDate;
     });
 
-    client.user.setActivity("nba help | nbabot.js.org | " + client.guilds.size + " servers, thanks for 250! :)", {
+    client.user.setActivity("nba help | nbabot.js.org | " + client.guilds.size + " servers, thanks for 300! :)", {
         type: "PLAYING"
     });
 });
@@ -1285,7 +1285,7 @@ setInterval(() => {
 }, 86400000);
 
 setInterval(() => {
-    client.user.setActivity("nba help | nbabot.js.org | " + client.guilds.size + " servers, thanks for 250! :)", {
+    client.user.setActivity("nba help | nbabot.js.org | " + client.guilds.size + " servers, thanks for 300! :)", {
         type: "PLAYING"
     });
 }, 60000);
