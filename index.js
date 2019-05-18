@@ -512,10 +512,17 @@ client.on('message', async message => {
                 uri: 'http://data.nba.net/10s/prod/v1/' + seasonScheduleYear + '/players.json',
                 json: true
             }, (e, r, b) => {
-
+                let desiredName;
+                if (args[args.length-1].toLowerCase() == "-c" || args[args.length-1].toLowerCase() == "-r") {
+                    console.log(args);
+                    let newArgs = args;
+                    newArgs.pop();
+                    console.log(args);
+                    desiredName = newArgs.join(' ');
+                } else {
+                    desiredName = args.join(' ');
+                }
                 for (var i = 0; i < b.league.standard.length; i++) {
-
-                    let desiredName;
 
                     /*
 
@@ -533,17 +540,11 @@ client.on('message', async message => {
 
                     */
 
-                    if (args[args.length-1].toLowerCase() == "-c" || args[args.length-1].toLowerCase() == "-r") {
-                        args.pop();
-                        desiredName = args.join(' ');
-                    } else {
-                        desiredName = args.join(' ');
-                    }
-
                     if ((b.league.standard[i].firstName.toLowerCase() + " " + b.league.standard[i].lastName.toLowerCase()) == desiredName.toLowerCase()) {
                         playerFound = true;
                         let playerName = b.league.standard[i].firstName + " " + b.league.standard[i].lastName;
-                        console.log(b.league.standard[i].personId);
+                        let player_Id = b.league.standard[i].personId;
+                        let team_Id = b.league.standard[i].teamId;
 
                         request({
                             uri: 'http://data.nba.net/10s/prod/v1/' + seasonScheduleYear + '/players/' + b.league.standard[i].personId + '_profile.json',
@@ -556,7 +557,9 @@ client.on('message', async message => {
 
                             let season, player;
 
-                            if (args[2]) {
+                            /*
+
+                            if (args.length == 3) {
                                 if (args[2].toLowerCase() == "-c") {
                                     player = b.league.standard.stats.careerSummary;
                                     season = "Career";
@@ -588,7 +591,7 @@ client.on('message', async message => {
                             } else if (b.league.standard.stats.latest.ppg != "-1" && b.league.standard.stats.latest.seasonStageId == 4) {
                                 player = b.league.standard.stats.latest;
                                 season = b.league.standard.stats.latest.seasonYear + "-" + (parseInt(b.league.standard.stats.latest.seasonYear) + 1) + " Playoff";
-                            } else if (args[3]) {
+                            } else if (args.length == 4) {
                                 if (args[3].toLowerCase() == "-c") {
                                     player = b.league.standard.stats.careerSummary;
                                     season = "Career";
@@ -606,7 +609,29 @@ client.on('message', async message => {
                                 season = "";
                             }
 
+                            */
+
                             // console.log(player);
+
+                            console.log(args[args.length-1]);
+                            if (args[args.length-1].toLowerCase() == "-c") {
+                                player = b.league.standard.stats.careerSummary;
+                                season = "Career";
+                            } else if (args[args.length-1].toLowerCase() == "-r") {
+                                player = b.league.standard.stats.regularSeason.season[0].teams[0];
+                                season = b.league.standard.stats.latest.seasonYear + "-" + (parseInt(b.league.standard.stats.latest.seasonYear) + 1) + " Regular season";
+                            } else {
+                                if (b.league.standard.stats.latest.ppg != "-1" && b.league.standard.stats.latest.seasonStageId == 4) { // Playoffs
+                                    player = b.league.standard.stats.latest;
+                                    season = b.league.standard.stats.latest.seasonYear + "-" + (parseInt(b.league.standard.stats.latest.seasonYear) + 1) + " Playoffs";
+                                } else if (b.league.standard.stats.latest.ppg == "-1" && b.league.standard.stats.latest.seasonStageId == 4) {
+                                    player = b.league.standard.stats.regularSeason.season[0].teams[0];
+                                    season = b.league.standard.stats.latest.seasonYear + "-" + (parseInt(b.league.standard.stats.latest.seasonYear) + 1) + " Regular season";
+                                } else if (b.league.standard.stats.latest.ppg != "-1" && b.league.standard.stats.latest.seasonStageId != 4){
+                                    player = b.league.standard.stats.latest;
+                                    season = b.league.standard.stats.latest.seasonYear + "-" + (parseInt(b.league.standard.stats.latest.seasonYear) + 1) + " Regular season";
+                                }
+                            }
 
                             let embed = new Discord.RichEmbed()
                                 .setTitle(season + " stats on the player `" + playerName + "`:")
@@ -624,8 +649,9 @@ client.on('message', async message => {
                                 .addField("Total +/-", player.plusMinus, true)
                                 .addField("Useful Tips", "Type `nba player-info " + args[0] + " " + args[1] + "` to view basic information on that player.\nType `nba player-stats " + args[0] + " " + args[1] + " -c` to view career stats on that player.\nType `nba player-stats " + args[0] + " " + args[1] + " -r` to view the latest regular season stats on that player if it defaults to playoff stats.")
                                 .setFooter("nba help")
+                                .setThumbnail("https://ak-static.cms.nba.com/wp-content/uploads/headshots/nba/"+ team_Id +"/"+ seasonScheduleYear +"/260x190/"+ player_Id + ".png")
                                 .setTimestamp();
-                            me.edit(embed);
+                            return me.edit(embed);
                         });
                     }
                 }
