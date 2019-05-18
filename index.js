@@ -265,8 +265,10 @@ client.on('message', async message => {
             break;
 
         case 'support':
-            message.channel.send("https://discord.gg/Bk8xATx");
+        case 'server':
+            message.channel.send("The NBABot Discord is available here: https://discord.gg/Bk8xATx");
             break;
+
 
         case 'scores':
         case 'today':
