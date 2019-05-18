@@ -1,5 +1,5 @@
 # [GitHub](https://github.com/EliotChignell/NBABot) [Invite](https://discordapp.com/api/oauth2/authorize?client_id=544017840760422417&permissions=0&scope=bot) [Vote](https://discordbots.org/bot/544017840760422417)
-### A Discord.js bot which keeps you up with the latest scores.
+### NBABot is Discord bot which keeps you up with the latest scores, statistics, and allows virtual betting (with fake credits) for you and your community. Proudly written in discord.js by chig#4519 and frequently contributed to by jstn#0666
 
 [![Discord Bots](https://discordbots.org/api/widget/544017840760422417.svg)](https://discordbots.org/bot/544017840760422417)
 
