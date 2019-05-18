@@ -23,8 +23,12 @@ const prefix = "nba ";
 const bets = new Enmap({
     name: "bets"
 });
-client.points = new Enmap({name: "points"});
-const serverList =  new Enmap({name: "serverConfigurations"});
+client.points = new Enmap({
+    name: "points"
+});
+const serverList = new Enmap({
+    name: "serverConfigurations"
+});
 
 let clientReady = false;
 
@@ -112,7 +116,7 @@ client.once('ready', () => {
         }, (e, r, b) => {
             for (var i = 0; i < b.league.standard.length; i++) {
                 if (b.league.standard[i].isNBAFranchise) {
-                	if (b.league.standard[i].nickname == "Trail Blazers") b.league.standard[i].nickname = "Blazers";
+                    if (b.league.standard[i].nickname == "Trail Blazers") b.league.standard[i].nickname = "Blazers";
                     teams[b.league.standard[i].teamId] = b.league.standard[i];
                     nicknames[b.league.standard[i].tricode] = b.league.standard[i].nickname;
                     triCodes[b.league.standard[i].nickname.toLowerCase()] = b.league.standard[i].tricode;
@@ -350,7 +354,7 @@ client.on('message', async message => {
                                 } else {
                                     str += " | " + b.games[i].vTeam.triCode + " leads series, " + b.games[i].vTeam.seriesWin + "-" + b.games[i].hTeam.seriesWin;
                                 }
-                            } else if (parseInt(b.games[i].hTeam.seriesWin) == parseInt(b.games[i].vTeam.seriesWin)) {// Series tied
+                            } else if (parseInt(b.games[i].hTeam.seriesWin) == parseInt(b.games[i].vTeam.seriesWin)) { // Series tied
                                 str += " | Series tied, " + b.games[i].hTeam.seriesWin + "-" + b.games[i].vTeam.seriesWin;
                             }
                         }
@@ -361,7 +365,7 @@ client.on('message', async message => {
                             continue;
                         }
                     }
-                    embed.addField("Want to view the scores from another date?","Use `nba scores yyyy/mm/dd`.");
+                    embed.addField("Want to view the scores from another date?", "Use `nba scores yyyy/mm/dd`.");
                     me.edit(embed);
                 });
             } else if (args[0]) {
@@ -375,7 +379,7 @@ client.on('message', async message => {
                 me = await message.channel.send(":timer: Loading...");
 
                 embed = new Discord.RichEmbed()
-                    .setTitle("Scores for the date "+args[0]+":")
+                    .setTitle("Scores for the date " + args[0] + ":")
                     .setColor(0xff4242)
                     .setFooter("nba help")
                     .setTimestamp();
@@ -398,10 +402,10 @@ client.on('message', async message => {
 
                         if (b.games[i].statusNum == 3) {
                             if (parseInt(b.games[i].hTeam.score) > parseInt(b.games[i].vTeam.score)) { // hTeam won
-                                console.log(b.games[i].hTeam.triCode+" won, "+b.games[i].hTeam.score+" > "+b.games[i].vTeam.score);
+                                console.log(b.games[i].hTeam.triCode + " won, " + b.games[i].hTeam.score + " > " + b.games[i].vTeam.score);
                                 str += b.games[i].vTeam.triCode + " " + b.games[i].vTeam.score + " - **" + b.games[i].hTeam.score + " " + b.games[i].hTeam.triCode + "**";
                             } else if (parseInt(b.games[i].vTeam.score) > parseInt(b.games[i].hTeam.score)) { // vTeam won
-                                console.log(b.games[i].vTeam.triCode+" won, "+b.games[i].vTeam.score+" > "+b.games[i].hTeam.score);
+                                console.log(b.games[i].vTeam.triCode + " won, " + b.games[i].vTeam.score + " > " + b.games[i].hTeam.score);
                                 str += "**" + b.games[i].vTeam.triCode + " " + b.games[i].vTeam.score + "** - " + b.games[i].hTeam.score + " " + b.games[i].hTeam.triCode;
                             }
                         } else {
@@ -444,7 +448,7 @@ client.on('message', async message => {
                                 } else {
                                     str += " | " + b.games[i].vTeam.triCode + " leads series, " + b.games[i].vTeam.seriesWin + "-" + b.games[i].hTeam.seriesWin;
                                 }
-                            } else if (parseInt(b.games[i].hTeam.seriesWin) == parseInt(b.games[i].vTeam.seriesWin)) {// Series tied
+                            } else if (parseInt(b.games[i].hTeam.seriesWin) == parseInt(b.games[i].vTeam.seriesWin)) { // Series tied
                                 str += " | Series tied, " + b.games[i].hTeam.seriesWin + "-" + b.games[i].vTeam.seriesWin;
                             }
                         }
@@ -493,7 +497,7 @@ client.on('message', async message => {
                             .addField("**Date of Birth**", b.league.standard[i].dateOfBirthUTC, true)
                             .addField("**Drafted**", draftStr, true)
                             .addField("**College**", schoolStr, true)
-                            .setThumbnail("https://ak-static.cms.nba.com/wp-content/uploads/headshots/nba/"+b.league.standard[i].teamId+"/"+ seasonScheduleYear +"/260x190/"+ b.league.standard[i].personId + ".png")
+                            .setThumbnail("https://ak-static.cms.nba.com/wp-content/uploads/headshots/nba/" + b.league.standard[i].teamId + "/" + seasonScheduleYear + "/260x190/" + b.league.standard[i].personId + ".png")
                             .addField("...", "Type `nba player-stats " + args.join(' ') + "` to view stats on that player.");
 
                         me.edit(embed);
@@ -518,11 +522,11 @@ client.on('message', async message => {
                 json: true
             }, (e, r, b) => {
                 let desiredName;
-                if (args[args.length-1].toLowerCase() == "-c" || args[args.length-1].toLowerCase() == "-r") {
-                    console.log(args);
-                    let newArgs = args;
-                    newArgs.pop();
-                    console.log(args);
+                if (args[args.length - 1].toLowerCase() == "-c" || args[args.length - 1].toLowerCase() == "-r") {
+                    let newArgs = [];
+                    for (var i = 0; i < args.length - 1; i++) {
+                        newArgs.push(args[i]);
+                    }
                     desiredName = newArgs.join(' ');
                 } else {
                     desiredName = args.join(' ');
@@ -555,74 +559,11 @@ client.on('message', async message => {
                             uri: 'http://data.nba.net/10s/prod/v1/' + seasonScheduleYear + '/players/' + b.league.standard[i].personId + '_profile.json',
                             json: true
                         }, (e, r, b) => {
-
-                            // Determing what type of season the user is requesting
-
-                            // console.log(b.league.standard.stats.latest.ppg+" "+b.league.standard.stats.latest.seasonStageId);
-
                             let season, player;
-
-                            /*
-
-                            if (args.length == 3) {
-                                if (args[2].toLowerCase() == "-c") {
-                                    player = b.league.standard.stats.careerSummary;
-                                    season = "Career";
-                                } else if (args[2].toLowerCase() == "-r") {
-                                    if (b.league.standard.stats.regularSeason.season[0].teams.length > 1) {
-                                        player = b.league.standard.stats.regularSeason.season[0].teams[0];
-                                        season = b.league.standard.stats.latest.seasonYear + "-" + (parseInt(b.league.standard.stats.latest.seasonYear) + 1) + " Regular season";
-                                    } else {
-                                        player = b.league.standard.stats.regularSeason.season[0].total;
-                                        season = b.league.standard.stats.latest.seasonYear + "-" + (parseInt(b.league.standard.stats.latest.seasonYear) + 1) + " Regular season";
-                                    }
-                                } else {
-                                    if (b.league.standard.stats.regularSeason.season[0].teams.length > 1) {
-                                        player = b.league.standard.stats.regularSeason.season[0].teams[0];
-                                        season = b.league.standard.stats.latest.seasonYear + "-" + (parseInt(b.league.standard.stats.latest.seasonYear) + 1) + " Regular season";
-                                    } else {
-                                        player = b.league.standard.stats.regularSeason.season[0].total;
-                                        season = b.league.standard.stats.latest.seasonYear + "-" + (parseInt(b.league.standard.stats.latest.seasonYear) + 1) + " Regular season";
-                                    }
-                                }
-                            } else if (b.league.standard.stats.latest.ppg == "-1") { // This means it's the playoffs and that player isn't in the playoffs. :(
-                                if (b.league.standard.stats.regularSeason.season[0].teams.length > 1) {
-                                    player = b.league.standard.stats.regularSeason.season[0].teams[0];
-                                    season = b.league.standard.stats.latest.seasonYear + "-" + (parseInt(b.league.standard.stats.latest.seasonYear) + 1) + " Regular season";
-                                } else {
-                                    player = b.league.standard.stats.regularSeason.season[0].total;
-                                    season = b.league.standard.stats.latest.seasonYear + "-" + (parseInt(b.league.standard.stats.latest.seasonYear) + 1) + " Regular season";
-                                }
-                            } else if (b.league.standard.stats.latest.ppg != "-1" && b.league.standard.stats.latest.seasonStageId == 4) {
-                                player = b.league.standard.stats.latest;
-                                season = b.league.standard.stats.latest.seasonYear + "-" + (parseInt(b.league.standard.stats.latest.seasonYear) + 1) + " Playoff";
-                            } else if (args.length == 4) {
-                                if (args[3].toLowerCase() == "-c") {
-                                    player = b.league.standard.stats.careerSummary;
-                                    season = "Career";
-                                } else if (args[3].toLowerCase() == "-r") {
-                                    if (b.league.standard.stats.regularSeason.season[0].teams.length > 1) {
-                                        player = b.league.standard.stats.regularSeason.season[0].teams[0];
-                                        season = b.league.standard.stats.latest.seasonYear + "-" + (parseInt(b.league.standard.stats.latest.seasonYear) + 1) + " Regular season";
-                                    } else {
-                                        player = b.league.standard.stats.regularSeason.season[0].total;
-                                        season = b.league.standard.stats.latest.seasonYear + "-" + (parseInt(b.league.standard.stats.latest.seasonYear) + 1) + " Regular season";
-                                    }
-                                }
-                            } else {
-                                player = b.league.standard.stats.latest;
-                                season = "";
-                            }
-
-                            */
-
-                            // console.log(player);
-
-                            console.log(args[args.length-1]);
-                            if (args[args.length-1].toLowerCase() == "-c") {
+                            if (args[args.length - 1].toLowerCase() == "-c") {
                                 player = b.league.standard.stats.careerSummary;
                                 season = "Career";
-                            } else if (args[args.length-1].toLowerCase() == "-r") {
+                            } else if (args[args.length - 1].toLowerCase() == "-r") {
                                 player = b.league.standard.stats.regularSeason.season[0].teams[0];
                                 season = b.league.standard.stats.latest.seasonYear + "-" + (parseInt(b.league.standard.stats.latest.seasonYear) + 1) + " Regular season";
                             } else {
@@ -632,7 +573,7 @@ client.on('message', async message => {
                                 } else if (b.league.standard.stats.latest.ppg == "-1" && b.league.standard.stats.latest.seasonStageId == 4) {
                                     player = b.league.standard.stats.regularSeason.season[0].teams[0];
                                     season = b.league.standard.stats.latest.seasonYear + "-" + (parseInt(b.league.standard.stats.latest.seasonYear) + 1) + " Regular season";
-                                } else if (b.league.standard.stats.latest.ppg != "-1" && b.league.standard.stats.latest.seasonStageId != 4){
+                                } else if (b.league.standard.stats.latest.ppg != "-1" && b.league.standard.stats.latest.seasonStageId != 4) {
                                     player = b.league.standard.stats.latest;
                                     season = b.league.standard.stats.latest.seasonYear + "-" + (parseInt(b.league.standard.stats.latest.seasonYear) + 1) + " Regular season";
                                 }
@@ -654,7 +595,7 @@ client.on('message', async message => {
                                 .addField("Total +/-", player.plusMinus, true)
                                 .addField("Useful Tips", "Type `nba player-info " + args[0] + " " + args[1] + "` to view basic information on that player.\nType `nba player-stats " + args[0] + " " + args[1] + " -c` to view career stats on that player.\nType `nba player-stats " + args[0] + " " + args[1] + " -r` to view the latest regular season stats on that player if it defaults to playoff stats.")
                                 .setFooter("nba help")
-                                .setThumbnail("https://ak-static.cms.nba.com/wp-content/uploads/headshots/nba/"+ team_Id +"/"+ seasonScheduleYear +"/260x190/"+ player_Id + ".png")
+                                .setThumbnail("https://ak-static.cms.nba.com/wp-content/uploads/headshots/nba/" + team_Id + "/" + seasonScheduleYear + "/260x190/" + player_Id + ".png")
                                 .setTimestamp();
                             return me.edit(embed);
                         });
@@ -899,7 +840,7 @@ client.on('message', async message => {
 
                 var rosterTable = new AsciiTable()
                 rosterTable
-                    .setHeading('Number','Name')
+                    .setHeading('Number', 'Name')
 
                 eDescription = "`";
                 let playerNumbers = "";
@@ -1007,14 +948,14 @@ client.on('message', async message => {
                 request({
                     uri: "http://data.nba.net/10s/prod/v1/" + key + "/scoreboard.json",
                     json: true
-                }, (e,r,b) => {
+                }, (e, r, b) => {
 
-                    let resultStr = "__"+(key.substring(0, 4) + "/" + key.substring(4, 6) + "/" + key.substring(6, 8))+"__\n";
+                    let resultStr = "__" + (key.substring(0, 4) + "/" + key.substring(4, 6) + "/" + key.substring(6, 8)) + "__\n";
                     let teamsDone = [];
 
-                    for (var i=0;i<betsPlaced[key].length;i++) {
+                    for (var i = 0; i < betsPlaced[key].length; i++) {
 
-                        for (var j=0;j<b.games.length;j++) {
+                        for (var j = 0; j < b.games.length; j++) {
 
                             if (b.games[j].statusNum != 3) continue;
 
@@ -1026,10 +967,10 @@ client.on('message', async message => {
                                 if (hTeamScore > vTeamScore) { // Guessed Correctly
                                     client.points.inc(message.author.id, "correct");
                                     client.points.inc(message.author.id, "points");
-                                    resultStr += b.games[j].hTeam.triCode+" guessed correctly (+1 pts)\n";
+                                    resultStr += b.games[j].hTeam.triCode + " guessed correctly (+1 pts)\n";
                                 } else if (vTeamScore > hTeamScore) { // Guessed Incorrectly
                                     client.points.inc(message.author.id, "wrong");
-                                    resultStr += b.games[j].hTeam.triCode+" guessed incorrectly (+0 pts)\n";
+                                    resultStr += b.games[j].hTeam.triCode + " guessed incorrectly (+0 pts)\n";
                                 }
                                 bets.remove(message.author.id, betsPlaced[key][i], key);
                             } else if ((betsPlaced[key][i] == b.games[j].vTeam.triCode) && b.games[j].statusNum == 3) { // Guessed vTeam
@@ -1037,17 +978,17 @@ client.on('message', async message => {
                                 if (vTeamScore > hTeamScore) { // Guessed Correctly
                                     client.points.inc(message.author.id, "correct");
                                     client.points.inc(message.author.id, "points");
-                                    resultStr += b.games[j].vTeam.triCode+" guessed correctly (+1 pts)\n";
+                                    resultStr += b.games[j].vTeam.triCode + " guessed correctly (+1 pts)\n";
                                 } else if (hTeamScore > vTeamScore) { // Guessed Incorrectly
                                     client.points.inc(message.author.id, "wrong");
-                                    resultStr += b.games[j].vTeam.triCode+" guessed incorrectly (+0 pts)\n";
+                                    resultStr += b.games[j].vTeam.triCode + " guessed incorrectly (+0 pts)\n";
                                 }
                                 bets.remove(message.author.id, betsPlaced[key][i], key);
                             }
 
                         }
 
-                        if (resultStr == "__"+(key.substring(0, 4) + "/" + key.substring(4, 6) + "/" + key.substring(6, 8))+"__\n") resultStr = "";
+                        if (resultStr == "__" + (key.substring(0, 4) + "/" + key.substring(4, 6) + "/" + key.substring(6, 8)) + "__\n") resultStr = "";
 
                     }
 
@@ -1071,15 +1012,15 @@ client.on('message', async message => {
             if (!args[0]) {
                 embed = new Discord.RichEmbed()
                     .setColor(0xFFD700)
-                    .setTitle("Balance for user "+message.author.tag)
+                    .setTitle("Balance for user " + message.author.tag)
                     .setThumbnail(message.author.avatarURL)
                     .setFooter("nba help")
                     .setTimestamp()
-                    .addField("Correct",client.points.get(message.author.id, "correct"), true)
-                    .addField("Wrong",client.points.get(message.author.id, "wrong"), true)
-                    .addField("Accuracy",Math.floor((client.points.get(message.author.id, "correct")/(client.points.get(message.author.id, "correct")+client.points.get(message.author.id, "wrong")))*100)+"%", true)
-                    .addField("Total Points",client.points.get(message.author.id, "points"), true)
-                    message.channel.send(embed);
+                    .addField("Correct", client.points.get(message.author.id, "correct"), true)
+                    .addField("Wrong", client.points.get(message.author.id, "wrong"), true)
+                    .addField("Accuracy", Math.floor((client.points.get(message.author.id, "correct") / (client.points.get(message.author.id, "correct") + client.points.get(message.author.id, "wrong"))) * 100) + "%", true)
+                    .addField("Total Points", client.points.get(message.author.id, "points"), true)
+                message.channel.send(embed);
             } else if (args[0]) {
                 if (!message.mentions.users.first()) return message.channel.send(':x: Error: Please mention a valid user. E.g. `nba bal @chig#4519`.');
                 let user = message.mentions.users.first() || client.users.get(args[0]);
@@ -1087,15 +1028,15 @@ client.on('message', async message => {
 
                 embed = new Discord.RichEmbed()
                     .setColor(0xFFD700)
-                    .setTitle("Balance for user "+client.users.get(user.id).tag)
+                    .setTitle("Balance for user " + client.users.get(user.id).tag)
                     .setThumbnail(client.users.get(user.id).avatarURL)
                     .setFooter("nba help")
                     .setTimestamp()
-                    .addField("Correct",client.points.get(user.id, "correct"), true)
-                    .addField("Wrong",client.points.get(user.id, "wrong"), true)
-                    .addField("Accuracy",Math.floor((client.points.get(user.id, "correct")/(client.points.get(user.id, "correct")+client.points.get(user.id, "wrong")))*100)+"%", true)
-                    .addField("Total Points",client.points.get(user.id, "points"), true)
-                    message.channel.send(embed);
+                    .addField("Correct", client.points.get(user.id, "correct"), true)
+                    .addField("Wrong", client.points.get(user.id, "wrong"), true)
+                    .addField("Accuracy", Math.floor((client.points.get(user.id, "correct") / (client.points.get(user.id, "correct") + client.points.get(user.id, "wrong"))) * 100) + "%", true)
+                    .addField("Total Points", client.points.get(user.id, "points"), true)
+                message.channel.send(embed);
             }
             break;
 
@@ -1118,26 +1059,26 @@ client.on('message', async message => {
                     if (client.points.has(member.id)) guildIDs.push(member.id);
                 });
 
-                let sorted = client.points.array().filter(p => guildIDs.includes(p.id)).sort((a, b) => a.points - b.points).reverse().splice(0,10);
+                let sorted = client.points.array().filter(p => guildIDs.includes(p.id)).sort((a, b) => a.points - b.points).reverse().splice(0, 10);
 
-                embed.setTitle("The Top 10 of the server `"+message.guild.name+"`:");
+                embed.setTitle("The Top 10 of the server `" + message.guild.name + "`:");
 
                 let counter = 1;
                 for (const data of sorted) {
-                    embed.addField(counter+". "+client.users.get(data.id).tag,"  "+data.points+" points ("+(Math.floor((client.points.get(data.id, "correct")/(client.points.get(data.id, "correct")+client.points.get(data.id, "wrong")))*100)+"%")+" accuracy)");
+                    embed.addField(counter + ". " + client.users.get(data.id).tag, "  " + data.points + " points (" + (Math.floor((client.points.get(data.id, "correct") / (client.points.get(data.id, "correct") + client.points.get(data.id, "wrong"))) * 100) + "%") + " accuracy)");
                     counter++;
                 }
 
-                embed.addField("...","Type `nba leaderboard global` to view the global top 10.");
+                embed.addField("...", "Type `nba leaderboard global` to view the global top 10.");
                 message.channel.send(embed);
 
             } else if (args[0]) { // Global Leaderboard
-                let sorted = client.points.array().sort((a, b) => a.points - b.points).reverse().splice(0,10);
+                let sorted = client.points.array().sort((a, b) => a.points - b.points).reverse().splice(0, 10);
                 console.log(sorted);
                 embed.setTitle("The Global Top 10:");
-                for (var i=0;i<sorted.length;i++) {
+                for (var i = 0; i < sorted.length; i++) {
                     // if (client.users.get(sorted[i].id)) rDescription += "\n- "+client.users.get(sorted[i].id).tag+"\n+ "+sorted[i].points+" credits";
-                    if (client.users.get(sorted[i].id)) embed.addField((i+1)+". "+client.users.get(sorted[i].id).tag,client.points.get(sorted[i].id, "points")+" points ("+(Math.floor((client.points.get(sorted[i].id, "correct")/(client.points.get(sorted[i].id, "correct")+client.points.get(sorted[i].id, "wrong")))*100)+"%")+" accuracy)");
+                    if (client.users.get(sorted[i].id)) embed.addField((i + 1) + ". " + client.users.get(sorted[i].id).tag, client.points.get(sorted[i].id, "points") + " points (" + (Math.floor((client.points.get(sorted[i].id, "correct") / (client.points.get(sorted[i].id, "correct") + client.points.get(sorted[i].id, "wrong"))) * 100) + "%") + " accuracy)");
                 }
                 message.channel.send(embed);
             }
@@ -1149,16 +1090,16 @@ client.on('message', async message => {
                 .setTitle("Betting Help")
                 .setFooter("nba help")
                 .setTimestamp()
-                .addField("nba betting-help","Shows you this message.")
-                .addField("nba betting-scores","Shows you the `nba scores` command but crosses out all games which haven't started.")
-                .addField("nba bet TEAM","If that team hasn't played today, you will bet on that team. If that team wins, you gain a point and if it doesn't, you don't gain any points.")
-                .addField("nba placedbets","Shows you your unclaimed bets.")
-                .addField("nba claim","Claims your unclaimed rewards. Unfortunately I cannot make this process automatic as it would be an intensive task for the bot.")
-                .addField("nba bal","Shows you your points as well as your accuracy.")
-                .addField("nba bal @user#1234","Shows the balance for that user.")
-                .addField("nba board","Shows the leaderboard for the server which you are currently in.")
-                .addField("nba board global","Shows the global leaderboard.")
-                message.channel.send(embed);
+                .addField("nba betting-help", "Shows you this message.")
+                .addField("nba betting-scores", "Shows you the `nba scores` command but crosses out all games which haven't started.")
+                .addField("nba bet TEAM", "If that team hasn't played today, you will bet on that team. If that team wins, you gain a point and if it doesn't, you don't gain any points.")
+                .addField("nba placedbets", "Shows you your unclaimed bets.")
+                .addField("nba claim", "Claims your unclaimed rewards. Unfortunately I cannot make this process automatic as it would be an intensive task for the bot.")
+                .addField("nba bal", "Shows you your points as well as your accuracy.")
+                .addField("nba bal @user#1234", "Shows the balance for that user.")
+                .addField("nba board", "Shows the leaderboard for the server which you are currently in.")
+                .addField("nba board global", "Shows the global leaderboard.")
+            message.channel.send(embed);
             break;
 
         case 'betting-scores':
@@ -1184,12 +1125,12 @@ client.on('message', async message => {
 
                     if (b.games[i].statusNum == 3) {
                         if (parseInt(b.games[i].hTeam.score) > parseInt(b.games[i].vTeam.score)) { // hTeam won
-                            str += "~~"+b.games[i].vTeam.triCode + " " + b.games[i].vTeam.score + " - **" + b.games[i].hTeam.score + " " + b.games[i].hTeam.triCode + "**~~";
+                            str += "~~" + b.games[i].vTeam.triCode + " " + b.games[i].vTeam.score + " - **" + b.games[i].hTeam.score + " " + b.games[i].hTeam.triCode + "**~~";
                         } else if (parseInt(b.games[i].vTeam.score) > parseInt(b.games[i].hTeam.score)) { // vTeam won
-                            str += "~~**" + b.games[i].vTeam.triCode + " " + b.games[i].vTeam.score + "** - " + b.games[i].hTeam.score + " " + b.games[i].hTeam.triCode+"~~";
+                            str += "~~**" + b.games[i].vTeam.triCode + " " + b.games[i].vTeam.score + "** - " + b.games[i].hTeam.score + " " + b.games[i].hTeam.triCode + "~~";
                         }
                     } else if (b.games[i].statusNum == 2) {
-                        str += "~~"+b.games[i].vTeam.triCode + " " + b.games[i].vTeam.score + " - " + b.games[i].hTeam.score + " " + b.games[i].hTeam.triCode+"~~";
+                        str += "~~" + b.games[i].vTeam.triCode + " " + b.games[i].vTeam.score + " - " + b.games[i].hTeam.score + " " + b.games[i].hTeam.triCode + "~~";
                     } else if (b.games[i].statusNum == 1) {
                         str += b.games[i].vTeam.triCode + " " + b.games[i].vTeam.score + " - " + b.games[i].hTeam.score + " " + b.games[i].hTeam.triCode;
                     }
@@ -1222,17 +1163,17 @@ client.on('message', async message => {
 
             break;
 
-        /* Server-specific configurations
-        case 'prefix':
-            if (!args[0]) {
-                embed = new Discord.RichEmbed()
-                    .setColor(0x3498DB)
-                    .setFooter("nba help")
-                    .setTimestamp()
-                    .setTitle(`The prefix for this server, ${message.guild.name}, is "${serverList.get(message.guild.id, "prefix")}"`)
-                    message.channel.send(embed);
-            }
-            break; */
+            /* Server-specific configurations
+            case 'prefix':
+                if (!args[0]) {
+                    embed = new Discord.RichEmbed()
+                        .setColor(0x3498DB)
+                        .setFooter("nba help")
+                        .setTimestamp()
+                        .setTitle(`The prefix for this server, ${message.guild.name}, is "${serverList.get(message.guild.id, "prefix")}"`)
+                        message.channel.send(embed);
+                }
+                break; */
 
     }
 
